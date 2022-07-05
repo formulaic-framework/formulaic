@@ -1,0 +1,23 @@
+= Installation
+
+You can install the entire kitchen sink, or pick-and-choose the components
+that you wish to use.
+
+== Install Entire Kitchen Sink
+
+In your {nest} server, install `@codelenny/api`:
+
+[source,sh]
+----
+yarn add @codelenny/api
+----
+
+In your {react} app, first install the core `@codelenny/sink`,
+then install a UI-framework-specific version of the library:
+
+[source,sh]
+----
+yarn add @codelenny/sink
+
+yarn add @codelenny/sink-mui
+----

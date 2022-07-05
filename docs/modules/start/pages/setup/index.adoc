@@ -1,0 +1,63 @@
+= Project Setup
+
+To use Sink in your web application, you'll need to have {nest} and {react} projects.
+
+== Monorepo Usage
+
+We recommend using a monolithic repository with Yarn 2+ ("Berry").
+If you do not wish to use a monorepo, we recommend creating two separate repositories, using Yarn or NPM.
+
+(Other monorepo systems are untested, and won't receive support)
+
+If you do not have a repository setup yet, run:
+
+[source,sh]
+----
+# Create a directory
+cd ~/Documents/
+mkdir my-app
+
+cd my-app
+
+# Setup a Git repository
+git init --initial-branch=main
+
+# Initialize Yarn, with Berry (v2+), setup as a monorepo
+yarn init -w -2
+----
+
+== Create Nest Application
+
+If you don't have an existing {nest} application, we recommend using the official boilerplate:
+
+[source,sh]
+----
+# Yarn defaults to storing monorepo packages in 'packages/'
+cd packages/
+
+# Always use 'npx', even if using Yarn Berry
+npx @nestjs/cli new <server>
+
+cd <server>
+
+# If in a monorepo, remove .git
+rm -rf .git
+
+# Add commonly used libraries
+yarn add @nestjs/swagger @nestjs/typeorm typeorm express
+yarn add --dev webpack
+
+# Add the database:
+yarn add pg # or mysql, sqlite, etc.
+----
+
+== Create React Application
+
+If you don't have an existing {react} application, we recommend using {vite}:
+
+[source,sh]
+----
+cd packages/
+
+yarn create vite --template react-ts <app>
+----

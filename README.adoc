@@ -1,0 +1,10 @@
+= CodeLenny's Kitchen Sink Framework
+:nest: https://nestjs.com/[NestJS]
+:react: https://reactjs.org/[React]
+
+"Kitchen Sink" is a collection of {nest} modules and {react} elements
+for building web applications, aimed to provide common functionalities and utilities.
+
+You do not need to integrate the entire Kitchen Sink in your project -
+similar to the Nest framework, we allow you to include the features you would like,
+and you retain the ability to configure and customize each piece.

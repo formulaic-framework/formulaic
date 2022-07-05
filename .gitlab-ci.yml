@@ -1,0 +1,17 @@
+include:
+  - template: 'Workflows/Branch-Pipelines.gitlab-ci.yml'
+  - project: rweda/ci-tasks
+    ref: main
+    file:
+      - /stages/full.yml
+      - /noop.yml
+      - /node.yml
+      - /rules.yml
+
+yarn version:
+  extends: .task-yarn-version
+
+yarn constraints:
+  extends: .task-yarn-version
+  script:
+    - yarn constraints

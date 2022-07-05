@@ -1,0 +1,11 @@
+name: sink
+version: '1.0'
+title: Kitchen Sink Framework
+nav:
+  - modules/start/nav.adoc
+
+asciidoc:
+  attributes:
+    nest: https://nestjs.com/[Nest]
+    react: https://reactjs.org/[React]
+    vite: https://vitejs.dev/[Vite]

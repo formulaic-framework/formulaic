@@ -1,0 +1,31 @@
+{
+  "name": "@codelenny/sink",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "prepack": "tsc && vite build",
+    "prepublishOnly": "tsc && vite build"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^1.3.0",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.9"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/sink",
+    "url": "https://github.com/codelenny/api.git"
+  },
+  "author": {
+    "name": "Flyyn"
+  }
+}
