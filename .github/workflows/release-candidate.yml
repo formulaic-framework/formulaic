@@ -52,5 +52,5 @@ jobs:
     - name: 'Upload the releases'
       run: |
         yarn config set -H 'npmAuthToken' "${{secrets.YARNBOT_NPM_TOKEN}}"
-        yarn config set -H 'npmRegistries["//npm.pkg.github.com"].npmAuthToken' "${{GITHUB_TOKEN}}"
+        yarn config set -H 'npmRegistries["//npm.pkg.github.com"].npmAuthToken' "${{secrets.GITHUB_TOKEN}}"
         ./scripts/release/02-release-builds.sh
