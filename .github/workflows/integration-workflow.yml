@@ -1,0 +1,115 @@
+on:
+  push:
+    branches:
+    - main
+    - 'cherry-pick/**'
+  pull_request:
+
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the main branch we don't
+  group: ${{github.workflow}}-${{github.ref}}-${{github.ref != 'refs/heads/main' || github.run_number}}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{startsWith(github.ref, 'refs/pull/')}}
+
+name: 'Integration'
+jobs:
+  chore:
+    name: 'Testing chores'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - run: |
+        git fetch --no-tags --unshallow origin HEAD main
+
+    - name: 'Use Node.js 16.x'
+      uses: actions/setup-node@master
+      with:
+        node-version: 16.x
+
+    - name: 'Check that the Yarn files don''t change on new installs (fix w/ "yarn install")'
+      run: |
+        yarn --immutable --immutable-cache
+      shell: bash
+
+    - name: 'Check that the cache files are consistent with their remote sources'
+      run: |
+        if [[ $(git diff --name-only "$(git merge-base origin/"$TARGET_BRANCH" HEAD)" HEAD -- .yarn/cache | wc -l) -gt 0 ]]; then
+          yarn --immutable --immutable-cache --check-cache
+        fi
+      shell: bash
+      if: |
+        (success() || failure()) && github.event.pull_request != ''
+      env:
+        TARGET_BRANCH: ${{github.event.pull_request.base.ref}}
+
+    - name: 'Check that the PR describes which packages should be bumped (fix w/ "yarn version check -i")'
+      run: |
+        yarn version check
+      shell: bash
+      if: |
+        (success() || failure()) && github.event.pull_request != ''
+
+    - name: 'Check for unmet constraints (fix w/ "yarn constraints --fix")'
+      run: |
+        yarn constraints
+      shell: bash
+      if: |
+        success() || failure()
+
+    - name: 'Check for duplicate dependencies (fix w/ "yarn dedupe")'
+      run: |
+        yarn dedupe --check
+      shell: bash
+      if: |
+        success() || failure()
+
+  build:
+    name: 'Build artifacts'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: 'Use Node.js 16.x'
+      uses: actions/setup-node@master
+      with:
+        node-version: 16.x
+
+  acceptance:
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+        - 14
+        platform:
+        - ubuntu-latest
+        - windows-latest
+        - macos-latest
+        include:
+          - node: 16
+            platform: ubuntu-latest
+          - node: 17
+            platform: ubuntu-latest
+
+    name: '${{matrix.platform}} w/ Node.js ${{matrix.node}}.x'
+    runs-on: ${{matrix.platform}}
+    needs: build
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: 'Use Node.js ${{matrix.node}}.x'
+      uses: actions/setup-node@master
+      with:
+        node-version: ${{matrix.node}}.x
+
+    - name: 'Run the server tests'
+      run: |
+        yarn --immutable --immutable-cache
+        yarn workspaces foreach -vptR \
+          --from server \
+          run build
+        yarn workspace server test
+      shell: bash

@@ -594,6 +594,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@formulaic/id@workspace:^, @formulaic/id@workspace:packages/id":
+  version: 0.0.0-use.local
+  resolution: "@formulaic/id@workspace:packages/id"
+  dependencies:
+    "@nestjs/common": ^8.4.7
+    "@types/nanoid-dictionary": ^4.2.0
+    "@types/uuid": ^8.3.4
+    nanoid: ^3.3.4
+    nanoid-dictionary: ^4.3.0
+    reflect-metadata: ^0.1.13
+    rxjs: ^7.5.5
+    typescript: ^4.7.4
+    uuid: ^8.3.2
+  peerDependencies:
+    "@nestjs/common": "*"
+  languageName: unknown
+  linkType: soft
+
 "@formulaic/react@workspace:^, @formulaic/react@workspace:packages/react":
   version: 0.0.0-use.local
   resolution: "@formulaic/react@workspace:packages/react"
@@ -1530,6 +1548,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/nanoid-dictionary@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@types/nanoid-dictionary@npm:4.2.0"
+  checksum: 8b92bf1f70702dab9e6b1c82e625b4790cc2438a480522074a3b55d86b4f2e2a96c8d4845a60529a3daa5c6377e55a3168be909a9bd6020a3b20205a6ec56c36
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 18.0.3
   resolution: "@types/node@npm:18.0.3"
@@ -1662,6 +1687,13 @@ __metadata:
   version: 1.0.0
   resolution: "@types/treeify@npm:1.0.0"
   checksum: 1b2397030d13beee7f82b878ca80feeddb0d550a6b00d8be30082a370c0ac5985ecf7b9378cf93ea278ff00c3e900b416ae8d9379f2c7e8caecdece1dfc77380
+  languageName: node
+  linkType: hard
+
+"@types/uuid@npm:^8.3.4":
+  version: 8.3.4
+  resolution: "@types/uuid@npm:8.3.4"
+  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
   languageName: node
   linkType: hard
 
@@ -5921,6 +5953,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanoid-dictionary@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "nanoid-dictionary@npm:4.3.0"
+  checksum: 254ed606f0ef6cfea6f5b1fcaa69f10d561650c0d2cff8b138290c6abd8cbdc3335be8799d7520b8ad8b598b8a8b2bd774bfea49eac1ddecb222e4d80e558de5
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.4":
   version: 3.3.4
   resolution: "nanoid@npm:3.3.4"
@@ -6906,6 +6945,7 @@ __metadata:
   resolution: "server@workspace:example/server"
   dependencies:
     "@formulaic/api": "workspace:^"
+    "@formulaic/id": "workspace:^"
     "@nestjs/cli": ^8.0.0
     "@nestjs/common": ^8.0.0
     "@nestjs/core": ^8.0.0
