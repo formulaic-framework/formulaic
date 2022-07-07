@@ -1,6 +1,6 @@
 = Project Setup
 
-To use Sink in your web application, you'll need to have {nest} and {react} projects.
+To use Formulaic in your web application, you'll need to have {nest} and {react} projects.
 
 == Monorepo Usage
 

@@ -1,11 +1,16 @@
 % Enforce all packages are MIT licensed.
 gen_enforced_field(WorkspaceCwd, 'license', 'MIT').
 
+gen_enforced_field(WorkspaceCwd, 'name', WorkspaceName) :-
+  sub_atom(WorkspaceCwd, 9, Len, After, PackageName),
+  atom_concat('@formulaic/', PackageName, WorkspaceName),
+  atom_concat('packages/', PackageName, WorkspaceCwd).
+
 % Enforce all packages set the correct repository
 gen_enforced_field(WorkspaceCwd, 'repository.type', 'git').
-gen_enforced_field(WorkspaceCwd, 'repository.url', 'https://github.com/codelenny/api.git').
+gen_enforced_field(WorkspaceCwd, 'repository.url', 'https://github.com/codelenny/formulaic.git').
 gen_enforced_field(WorkspaceCwd, 'repository.directory', WorkspaceCwd) :-
-  workspace_field(WorkspaceCwd, 'version', _).
+  \+ WorkspaceCwd = '.'.
 
 % Enforce all packages have an author
 gen_enforced_field(WorkspaceCwd, 'author.name', 'Flyyn').

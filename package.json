@@ -1,5 +1,5 @@
 {
-  "name": "sink",
+  "name": "formulaic",
   "packageManager": "yarn@3.2.1",
   "private": true,
   "workspaces": [
@@ -13,7 +13,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/codelenny/api.git"
+    "url": "https://github.com/codelenny/formulaic.git"
   },
   "author": {
     "name": "Flyyn"

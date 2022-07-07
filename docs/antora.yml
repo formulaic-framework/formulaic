@@ -1,6 +1,6 @@
-name: sink
+name: formulaic
 version: '1.0'
-title: Kitchen Sink Framework
+title: Formulaic Framework
 nav:
   - modules/start/nav.adoc
 

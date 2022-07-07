@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@codelenny/sink": "workspace:^",
+    "@formulaic/react": "workspace:^",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
@@ -23,7 +23,7 @@
   "repository": {
     "type": "git",
     "directory": "example/web-app",
-    "url": "https://github.com/codelenny/api.git"
+    "url": "https://github.com/codelenny/formulaic.git"
   },
   "author": {
     "name": "Flyyn"

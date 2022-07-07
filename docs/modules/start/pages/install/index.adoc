@@ -1,23 +1,23 @@
 = Installation
 
-You can install the entire kitchen sink, or pick-and-choose the components
+You can install the entire framework, or pick-and-choose the components
 that you wish to use.
 
 == Install Entire Kitchen Sink
 
-In your {nest} server, install `@codelenny/api`:
+In your {nest} server, install `@formulaic/api`:
 
 [source,sh]
 ----
-yarn add @codelenny/api
+yarn add @formulaic/api
 ----
 
-In your {react} app, first install the core `@codelenny/sink`,
+In your {react} app, first install the core `@formulaic/react`,
 then install a UI-framework-specific version of the library:
 
 [source,sh]
 ----
-yarn add @codelenny/sink
+yarn add @formulaic/react
 
-yarn add @codelenny/sink-mui
+yarn add @formulaic/mui
 ----

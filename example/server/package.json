@@ -23,7 +23,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@codelenny/api": "workspace:^",
+    "@formulaic/api": "workspace:^",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
@@ -80,6 +80,6 @@
   "repository": {
     "type": "git",
     "directory": "example/server",
-    "url": "https://github.com/codelenny/api.git"
+    "url": "https://github.com/codelenny/formulaic.git"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@codelenny/sink",
+  "name": "@formulaic/react",
   "version": "0.1.0",
   "scripts": {
     "dev": "vite",
@@ -22,8 +22,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "directory": "packages/sink",
-    "url": "https://github.com/codelenny/api.git"
+    "directory": "packages/react",
+    "url": "https://github.com/codelenny/formulaic.git"
   },
   "author": {
     "name": "Flyyn"
