@@ -1,0 +1,3 @@
+releases:
+  "@formulaic/id": minor
+  server: patch
