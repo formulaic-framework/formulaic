@@ -579,10 +579,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formulaic/api@workspace:^, @formulaic/api@workspace:packages/api":
+"@formulaic/api@workspace:packages/api":
   version: 0.0.0-use.local
   resolution: "@formulaic/api@workspace:packages/api"
   dependencies:
+    "@formulaic/id": "workspace:^"
     "@nestjs/common": ^8.4.7
     "@nestjs/core": ^8.4.7
     reflect-metadata: ^0.1.13
@@ -6944,7 +6945,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:example/server"
   dependencies:
-    "@formulaic/api": "workspace:^"
     "@formulaic/id": "workspace:^"
     "@nestjs/cli": ^8.0.0
     "@nestjs/common": ^8.0.0

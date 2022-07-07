@@ -1,3 +1,6 @@
 releases:
   "@formulaic/id": minor
-  server: patch
+  server: minor
+
+undecided:
+  - "@formulaic/api"
