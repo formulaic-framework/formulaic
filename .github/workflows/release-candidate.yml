@@ -19,7 +19,6 @@ jobs:
     - uses: actions/checkout@master
       with:
         ref: main
-        token: ${{secrets.YARNBOT_TOKEN}}
 
     - name: 'Retrieve all the relevant tags'
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
