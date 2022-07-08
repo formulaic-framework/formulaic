@@ -8,7 +8,7 @@ gen_enforced_field(WorkspaceCwd, 'name', WorkspaceName) :-
 
 % Enforce all packages set the correct repository
 gen_enforced_field(WorkspaceCwd, 'repository.type', 'git').
-gen_enforced_field(WorkspaceCwd, 'repository.url', 'https://github.com/codelenny/formulaic.git').
+gen_enforced_field(WorkspaceCwd, 'repository.url', 'https://github.com/formulaic-framework/formulaic.git').
 gen_enforced_field(WorkspaceCwd, 'repository.directory', WorkspaceCwd) :-
   \+ WorkspaceCwd = '.'.
 

@@ -18,6 +18,6 @@
   "repository": {
     "directory": "packages/data",
     "type": "git",
-    "url": "https://github.com/codelenny/formulaic.git"
+    "url": "https://github.com/formulaic-framework/formulaic.git"
   }
 }

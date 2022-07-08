@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/codelenny/formulaic.git",
+    "url": "https://github.com/formulaic-framework/formulaic.git",
     "directory": "packages/api"
   },
   "main": "dist/index.js",

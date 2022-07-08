@@ -17,7 +17,7 @@
   "repository": {
     "directory": "example/acl",
     "type": "git",
-    "url": "https://github.com/codelenny/formulaic.git"
+    "url": "https://github.com/formulaic-framework/formulaic.git"
   },
   "dependencies": {
     "@casl/ability": "^5.4.4",
