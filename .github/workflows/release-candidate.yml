@@ -40,6 +40,11 @@ jobs:
     #     echo "yarnPath: '$TMPBIN/yarn.js'" >> .yarnrc.yml
     #     git update-index --skip-worktree -- .yarnrc.yml
 
+    - name: 'Build packages'
+      run: |
+        yarn workspaces foreach -vptR \
+          run build
+
     - name: 'Generate the release commits'
       if: ${{fromJSON(github.event.inputs.apply_versions)}}
       run: |
