@@ -8,10 +8,10 @@ export function abilityFor(user?: AclUser) {
   const { can, cannot, build } = new AbilityBuilder(AppAbility);
 
   const roles = user.roles ?? [];
-  const admin = user.roles.includes(Role.ADMIN);
-  const editor = user.roles.includes(Role.EDITOR);
-  const writer = user.roles.includes(Role.WRITER);
-  const mod = user.roles.includes(Role.MODERATOR);
+  const admin = roles.includes(Role.ADMIN);
+  const editor = roles.includes(Role.EDITOR);
+  const writer = roles.includes(Role.WRITER);
+  const mod = roles.includes(Role.MODERATOR);
 
   const staff = admin || editor || writer || mod;
 
