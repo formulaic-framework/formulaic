@@ -23,8 +23,8 @@ export const MAX_ALPHANUMERIC_SIZE = {
 } as const;
 
 export type IDDefinition
-  = readonly ["safe", keyof typeof MAX_NOLOOKALIKES_SIZE]
-  | readonly ["alphanumeric", keyof typeof MAX_ALPHANUMERIC_SIZE]
+  = readonly ["safe", number | keyof typeof MAX_NOLOOKALIKES_SIZE]
+  | readonly ["alphanumeric", number | keyof typeof MAX_ALPHANUMERIC_SIZE]
   | "uuid";
 
 export type IDConfig = Record<string, IDDefinition>;

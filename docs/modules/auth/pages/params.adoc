@@ -1,0 +1,133 @@
+= Parameter Decorators
+
+You can access the properties of the current user via various parameters.
+
+== Decorator Argument
+
+All decorators come with a single argument, `"optional"`, that defaults to `false`.
+
+If `"optional"` is not set to `true`, requests that lack the authentication property
+requested will throw an error:
+
+[source,ts]
+----
+import { Controller, Get } from "@nestjs/common";
+import { CurrentUserId, Private } from "@formulaic/auth-module";
+
+@Controller("unsafe-auth")
+@Public() // (or use defaultPolicy: "allow")
+export class UnsafeAuthDecorator {
+
+  @Get("unsafe")
+  public async unsafe(
+    @CurrentUserId() id: string, // <.>
+  ) {
+    return `You are ${id}`;
+  }
+
+  @Get("optional")
+  public async optional(
+    @CurrentUserId(true) id?: string, // <.>
+  ) {
+    if(id) {
+      return `You are ${id}`;
+    }
+    return `You are not logged in.`;
+  }
+
+  @Get("private")
+  @Private()
+  public async private(
+    @CurrentUserId() id: string, // <.>
+  ) {
+    return `You are ${id}`;
+  }
+
+}
+----
+<.> This is not recommended - the `@CurrentUserId` decorator will throw an error
+    that auth is required, _after_ the `AuthGuard` has let the user through.
+<.> This is safe - decorator will return `undefined` if the user doesn't have
+    an authentication set.
+<.> This is safe - the `AuthGuard` will ensure there's an active user with `@Private()`,
+    so `@CurrentUserId` is guaranteed to have data.
+
+== Current User Id
+
+The `@CurrentUserId` will return the id parsed with the `userId` setting.
+
+== Fetch Current User
+
+The `@CurrentUserFetch` will execute the function set by `getUserById`,
+directly returning whatever is returned, which may be a `Promise`.
+
+If you provided the following config when calling `AuthModule.forRootAsync`
+in the `AppModule`:
+
+.Inside `src/app.module.ts`
+[source,ts]
+----
+@Module({
+  imports: [
+    AuthModule.forRootAsync({
+      // ...
+      useFactory: (userService: UserService) => ({
+        // ...
+        getUserById: id => userService.getUserById(id), // Promise<User>
+      }),
+    }),
+  ],
+})
+export class AppModule {}
+----
+
+then methods in a controller would have the signature:
+
+[source,ts]
+----
+export class ExampleController {
+  @Get("route")
+  public async myRoute(@CurrentUserFetch() user: Promise<User>) {}
+}
+----
+
+If `getUserById` returns a value that isn't in a `Promise`,
+you wouldn't need to wrap the parameter in `Promise` inside the controller.
+
+== Current User
+
+To avoid the `Promise` wrapper, you can use `@ParseUser` and `@CurrentUser`:
+
+[source,ts]
+----
+import { Protected, ParseUser, CurrentUser } from "@formulaic/auth-module";
+
+@Controller("user-object")
+export class UserObjectController {
+  @Get("user")
+  @Protected()
+  @ParseUser()
+  public async example(
+    @CurrentUser() user: User,
+  ) {
+    return `Hello ${user.name}!`;
+  }
+}
+----
+
+== JWT Payload
+
+You can get the actual JWT with `@CurrentJWT`:
+
+[source,ts]
+----
+import { CurrentJWT } from "@formulaic/auth-module";
+
+export class JwtController {
+  @Get("jwt")
+  @Protected()
+  public async jwt(@CurrentJWT() jwt: JWTPayload) {
+    return jwt.sub;
+  }
+}
+----

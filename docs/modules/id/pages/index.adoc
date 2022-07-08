@@ -1,0 +1,143 @@
+= ID Generation
+
+Formulaic ships with a module to assist in generating UUIDs via a number of methods,
+including UUID and Nanoids.
+
+== Installation
+
+The ID generation module is distributed as part of the `@formulaic/api` bundle,
+as well as individually as `@formulaic/id`.
+
+[source,ts]
+----
+import { IDModule } from "@formulaic/api";
+// or
+import { IDModule } from "@formulaic/id";
+----
+
+== Defining ID Types
+
+To start using the ID generation module, first define the generation method for various IDs.
+
+.`src/id.ts`
+[source,ts]
+----
+// import { IDConfig } from "@formulaic/id";
+// export const IDs: IDConfig = { // <.>
+
+export const IDs = {
+
+  article: "uuid",
+
+  draft: ["alphanumeric", 12],
+
+  comment: ["alphanumeric", "billion"],
+
+  user: ["safe", "millions"],
+
+} as const;
+
+export type ID = typeof IDs;
+----
+<.> You may wish to use `const IDs: IDConfig` to ensure type-safety and autocomplete
+    during development - however, make sure you remove the type so you retain more
+    information when you use the object.
+
+=== Note: Types of IDs
+
+The ID generation module supports multiple forms of IDs.
+
+==== UUID (v4)
+
+To generate a standard UUIDv4 ID, specify `"uuid"`.
+
+==== Nano ID (alphanumeric, safe)
+
+To generate short (but still collision safe) IDs, we use the {nanoid} library.
+
+We provide a few presets:
+
+`alphanumeric`::
+Generates random IDs using `a-z`, `A-Z`, `0-9`.
+No filters are applied to prevent (potentially explicit) words.
+
+`safe`::
+Uses the https://github.com/CyberAP/nanoid-dictionary#nolookalikessafe[`nolookalikesSafe`] preset
+from `nanoid-dictionary`, which omits letters that look similar
+(`1`, `l`, `I`, etc.)
+as well as vowels, `3`, `4`, `x`, `X`, `V` - which should prevent obscene words.
+
+There is no standard length for Nano ID-generated IDs; instead each generator
+takes a configuration parameter that sets the length of generated ID.
+
+You may provide the length directly
+(in the example, drafts will be given a 12-character alphanumeric ID),
+or use a preset size.
+
+Each size represents a safe number of IDs that can be generated before there's a 1%
+risk of collision.
+
+By using the "billion" alphanumeric preset, generated IDs will be 11 characters long,
+allowing 1025622000 IDs to be generated before reaching that 1% risk.
+
+== Including the ID Module
+
+Provide the ID configuration when importing the `IDModule`.
+
+.`src/app.module.ts`
+[source,ts]
+----
+import { IDModule } from "@formulaic/id";
+import { IDs } from "./id";
+
+@Module({
+  imports: [
+    IDModule.forRoot({
+      ids: IDs,
+    }),
+  ],
+})
+export class AppModule {}
+----
+
+Also import the module into any application modules that
+use it:
+
+.`src/user/user.module.ts`
+[source,ts]
+----
+import { IDModule } from "@formulaic/id";
+
+@Module({
+  imports: [
+    IDModule,
+  ],
+})
+export class UserModule {}
+----
+
+== Using the ID Generation Service
+
+Use the `IDService` inside your services:
+
+.`src/user/user.service.ts`
+[source,ts]
+----
+import { IDService } from "@formulaic/id";
+import { ID } from "../id";
+
+@Injectable()
+export class UserService {
+
+  public constructor(
+    private readonly id: IDService<ID>,
+  ) {}
+
+  public async example() {
+    const id = await this.id.id("user");
+    // or use synchronously:
+    const id = await this.id.sync("user");
+  }
+
+}
+----

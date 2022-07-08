@@ -30,11 +30,19 @@ export class IDService<IDs extends IDConfig> {
       return v4();
     }
     if(config[0] === "safe") {
-      const size = MAX_NOLOOKALIKES_SIZE[config[1]];
+      const sizeConfig = config[1];
+      if(typeof sizeConfig === "number") {
+        return this.safe(sizeConfig);
+      }
+      const size = MAX_NOLOOKALIKES_SIZE[sizeConfig];
       return this.safe(size);
     }
     if(config[0] === "alphanumeric") {
-      const size = MAX_ALPHANUMERIC_SIZE[config[1]];
+      const sizeConfig = config[1];
+      if(typeof sizeConfig === "number") {
+        return this.safe(sizeConfig);
+      }
+      const size = MAX_ALPHANUMERIC_SIZE[sizeConfig];
       return this.alphanumeric(size);
     }
   }

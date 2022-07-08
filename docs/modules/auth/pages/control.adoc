@@ -1,0 +1,104 @@
+= Control Decorators
+:setting: xref:config.adoc[setting]
+
+`AuthModule` provides decorators that can control how the `AuthGuard` authenticates requests.
+
+== Private/Public
+
+You can annotate routes or controllers with `@Private` or `@Public` to control how anonymous requests
+are handled.
+
+This overrides the `defaultPolicy` {setting}.
+
+.if `defaultPolicy` is `"allow"`
+[source,ts]
+----
+import { Controller, Get } from "@nestjs/common";
+import { Public, Private } from "@formulaic/auth-module";
+
+@Controller("default")
+export class DefaultController {
+
+  @Get("/")
+  public defaultRoute() {
+    return "Anyone can access this, due to defaultPolicy=allow";
+  }
+
+  @Get("protected")
+  @Protected()
+  public protectedRoute() {
+    return "Only users with valid authentication can access this route.";
+  }
+
+}
+
+@Controller("protected")
+@Protected()
+export class ProtectedController {
+
+  @Get("/")
+  public defaultRoute() {
+    return "Only authenticated users can access this route.";
+  }
+
+  @Get("public")
+  @Public()
+  public publicRoute() {
+    return "Anyone can access this, due to @Public overriding @Protected";
+  }
+
+}
+----
+
+- `@Public()` or `@Private()` on a route will override any other setting
+- `@Public()` or `@Private()` on a controller will override `defaultPolicy`
+- `defaultPolicy` will be used if no decorator is set on a route/controller
+
+== Require Roles
+
+You can require users to have all roles specified with `@RequireRoles`:
+
+.Require one or more roles
+[source,ts]
+----
+import { Controller, Get } from "@nestjs/common";
+import { RequireRoles } from "@formulaic/auth-module";
+
+@Controller("role")
+export class RoleController {
+
+  @Get("admin")
+  @RequireRoles("admin")
+  public async adminOnly() {
+    return "you are an admin.";
+  }
+
+  @Get("promote")
+  @RequireRoles("user", "guest")
+  public async promoteGuest() {
+    return "you are a user and a guest account";
+  }
+
+}
+----
+
+== Require any of specified roles
+
+You can require a user to have any of the roles specified by `@RequireOneOfRole`:
+
+[source,ts]
+----
+import { Controller, Get } from "@nestjs/common";
+import { RequireOneOfRole } from "@formulaic/auth-module";
+
+@Controller("any-role")
+export class AnyRoleController {
+
+  @Get("staff")
+  @RequireOneOfRole("admin", "manager", "clerk")
+  public async staff() {
+    return "You are some level of staff.";
+  }
+
+}
+----

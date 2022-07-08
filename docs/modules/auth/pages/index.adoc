@@ -1,0 +1,16 @@
+= Authentication
+
+Formulaic provides an authentication module that parses incoming requests,
+assuming users provide a JWT as `Bearer` token.
+
+== Installation
+
+The authentication module is provided as part of the `@formulaic/api` bundle,
+as well as individually as `@formulaic/auth-module`.
+
+[source,ts]
+----
+import { AuthModule } from "@formulaic/api";
+// or
+import { AuthModule } from "@formulaic/auth-module";
+----

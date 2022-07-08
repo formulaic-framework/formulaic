@@ -112,4 +112,5 @@ jobs:
           --from server \
           run build
         yarn workspace server test
+        yarn workspace server test:e2e
       shell: bash
