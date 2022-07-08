@@ -48,7 +48,7 @@ jobs:
 
     - name: 'Build packages'
       run: |
-        yarn
+        yarn --immutable
         yarn workspaces foreach -vpt \
           run build
 
