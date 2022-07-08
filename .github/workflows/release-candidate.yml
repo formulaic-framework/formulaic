@@ -43,7 +43,7 @@ jobs:
     - name: 'Build packages'
       run: |
         yarn
-        yarn workspaces foreach -vptR \
+        yarn workspaces foreach -vpt \
           run build
 
     - name: 'Generate the release commits'
