@@ -1,3 +1,4 @@
+import { HashModule } from "@formulaic/hash";
 import { IDModule } from "@formulaic/id";
 import { MAX_NOLOOKALIKES_SIZE } from "@formulaic/id/dist/config";
 import { Test, TestingModule } from "@nestjs/testing";
@@ -23,6 +24,7 @@ describe('UserService', () => {
           synchronize: true,
         }),
         TypeOrmModule.forFeature([User]),
+        HashModule,
         IDModule.forRoot({
           ids: IDs,
         }),
