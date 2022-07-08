@@ -26,9 +26,9 @@ if [[ ${#RELEASE_ARGUMENTS[@]} -eq 0 ]]; then
   exit 0
 fi
 
-YARN_NPM_PUBLISH_REGISTRY=https://npm.pkg.github.com yarn workspaces foreach \
-  --verbose --topological --no-private "${RELEASE_ARGUMENTS[@]}" \
-  npm publish --tolerate-republish
+# YARN_NPM_PUBLISH_REGISTRY=https://npm.pkg.github.com yarn workspaces foreach \
+#   --verbose --topological --no-private "${RELEASE_ARGUMENTS[@]}" \
+#   npm publish --tolerate-republish
 
 yarn workspaces foreach \
   --verbose --topological --no-private "${RELEASE_ARGUMENTS[@]}" \
