@@ -1,0 +1,42 @@
+{
+  "name": "@formulaic/auth-module",
+  "version": "0.1.0",
+  "packageManager": "yarn@3.2.1",
+  "author": {
+    "name": "Flyyn"
+  },
+  "license": "MIT",
+  "repository": {
+    "directory": "packages/auth-module",
+    "type": "git",
+    "url": "https://github.com/codelenny/formulaic.git"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepack": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^8.4.7",
+    "@nestjs/core": "^8.4.7",
+    "@nestjs/websockets": "^8.4.7",
+    "@types/express": "^4.17.13",
+    "express": "^4.18.1",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.5.5",
+    "socket.io": "^4.5.1",
+    "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "*",
+    "@nestjs/core": "*"
+  },
+  "dependencies": {
+    "@formulaic/data": "workspace:^",
+    "class-transformer": "^0.5.1",
+    "class-transformer-validator": "^0.9.1",
+    "class-validator": "^0.13.2",
+    "jsonwebtoken": "^8.5.1"
+  }
+}

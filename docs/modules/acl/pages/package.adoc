@@ -1,0 +1,20 @@
+= Creating an ACL Package
+
+We recommend that you create a separate library to contain your ACL logic -
+this will make it very easy to share between your backend and frontend.
+
+If you are working in a monorepo, initialize a new package.
+
+[source,sh]
+----
+cd packages/
+
+mkdir acl/
+cd acl/
+
+yarn init
+yarn add @casl/ability
+yarn add --dev typescript
+----
+
+You may also wish to add `@formulaic/acl` for a couple of utilities.

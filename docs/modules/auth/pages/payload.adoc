@@ -1,0 +1,31 @@
+= Defining a JWT Payload
+
+The authentication module assumes that you have a definition of the payload
+that will be provided in the JWT.
+
+If you set validations with `class-validator`, JWTs will be validated
+to ensure they match the format required.
+
+.`src/user/dto/jwt-payload.ts`
+[source,ts]
+----
+import { IsString } from "class-validator";
+
+export class JWTPayload {
+
+  /**
+   * The ID of the user.
+   */
+  @IsString()
+  sub: string;
+
+  /**
+   * The user's roles.
+   */
+  @IsString({
+    each: true,
+  })
+  roles: string[];
+
+}
+----

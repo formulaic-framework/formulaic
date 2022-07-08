@@ -1,0 +1,9 @@
+= Authorization
+
+Some of Formulaic's modules provide integration with authorization systems.
+
+Our core modules (such as xref:auth:index.adoc[]) are relatively framework agnostic,
+but our more higher-level modules are opinionated and require {casl}.
+
+The following pages will walk through setting up a {casl}-based authorization system
+that will nicely integrate with Formulaic.

@@ -1,0 +1,48 @@
+= Module Configuration
+
+Add `AuthModule` to your root `AppModule`:
+
+.`src/app.module.ts`
+[source,ts]
+----
+import { AuthModule } from "@formulaic/auth-module";
+import { UserModule } from "./user/user.module";
+import { UserService } from "./user/user.service";
+import { JwtPayload } from "./user/dto/jwt-payload";
+
+@Module({
+  imports: [
+    AuthModule.forRootAsync({
+      global: true, // <.>
+      imports: [ UserModule ],
+      inject: [ UserService ], // <.>
+      useFactory: (users: UserService) => ({
+        secretOrPublicKey: "secret-token-change-me", // <.>
+        defaultPolicy: "allow", // <.>
+        payload: JWTPayload, // <.>
+        userId: ({ sub }) => sub, // <.>
+        getUserById: id => users.findById(id, true), // <.>
+        getRoles: ({ roles }) => roles, // <.>
+      }),
+    }),
+    UserModule,
+  ],
+})
+export class AppModule {}
+----
+<.> if `true`, `AuthGuard` will be setup as the global application guard,
+    checking every request to the application.
+<.> You should inject a user service, so routes can opt-in to fetching the entire
+    user object. (For performance, routes by default only get details from the JWT)
+<.> Provide the JWT public key or secret to authenticate JWTs provided in the
+    `Authorization` header.
+<.> Use `"allow"` to permit anyone to visit routes, except those marked `@Private`. +
+    Set to `"deny"` to prevent anonymous access to routes, unless they are marked
+    `@Public`.
+<.> Provide the structure of JWT payloads, so the module will ensure JWTs match.
+<.> Given a JWT payload, provide the user ID - this will be used for `getUserById`,
+    as well as the `@CurrentUserId()` decorator.
+<.> A method to lookup an entire user object given the ID.
+    Routes can get this function (lazily) via `@CurrentUserFetch`, or can request
+    the evaluated result if they set `@ParseUser()`.
+<.> Get the user's roles - allows routes to set `@RequireRoles`/`@RequireOneOfRole`

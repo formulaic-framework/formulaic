@@ -1,0 +1,25 @@
+= Define Abilities
+
+Once you have defined your
+xref:actions.adoc[actions],
+xref:roles.adoc[roles],
+and xref:subjects[subjects],
+you can define the abilities that can be performed on each subject.
+
+`src/ability.ts` in ACL package
+[source,ts]
+----
+import { Ability, AbilityClass } from "@casl/ability";
+import { Action, CRUDAction } from "@formulaic/acl";
+import * from "./subjects";
+
+export type Abilities
+  = [Action.MANAGE | Action.BROWSE, "all"]
+  | [Action, Subject.AclArticle | AclArticle]
+  | [CRUDAction, Subject.AclDraft | AclDraft]
+  | [Action, Subject.AclComment | AclComment]
+  | [CRUDAction, Subject.AclUser | AclUser];
+
+export type AppAbility = Ability<Abilities>;
+export const AppAbility = Ability as AbilityClass<AppAbility>;
+----

@@ -3,9 +3,15 @@ version: '1.0'
 title: Formulaic Framework
 nav:
   - modules/start/nav.adoc
+  - modules/id/nav.adoc
+  - modules/entity-service/nav.adoc
+  - modules/acl/nav.adoc
+  - modules/auth/nav.adoc
 
 asciidoc:
   attributes:
+    casl: https://casl.js.org/v5/[CASL]
+    nanoid: https://github.com/ai/nanoid[Nano ID]
     nest: https://nestjs.com/[Nest]
     react: https://reactjs.org/[React]
     vite: https://vitejs.dev/[Vite]

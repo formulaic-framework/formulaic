@@ -1,0 +1,30 @@
+{
+  "name": "@formulaic/entity-service",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepack": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "packageManager": "yarn@3.2.1",
+  "devDependencies": {
+    "typeorm": "^0.3.7",
+    "typescript": "^4.7.4"
+  },
+  "author": {
+    "name": "Flyyn"
+  },
+  "license": "MIT",
+  "repository": {
+    "directory": "packages/entity-service",
+    "type": "git",
+    "url": "https://github.com/codelenny/formulaic.git"
+  },
+  "peerDependencies": {
+    "typeorm": "*"
+  },
+  "dependencies": {
+    "@formulaic/data": "workspace:^"
+  }
+}

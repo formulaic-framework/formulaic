@@ -1,0 +1,93 @@
+= Integration with ACL
+
+Formulaic is setup to integrate with a xref:acl:index.adoc[authorization package]
+if you've xref:acl:package.adoc[created one].
+
+== Update JWT Payload
+
+Update your JWT payload to use the `Role` enum defined by your ACL library.
+
+[source,ts]
+----
+import { Role } from "acl";
+import { IsString } from "class-validator";
+
+export class JWTPayload {
+
+  @IsString()
+  sub: string;
+
+  @IsString({
+    each: true,
+  })
+  roles: Role[];
+
+}
+
+----
+
+== Attach Abilities
+
+In the module configuration, provide an `acl` method to attach an ACL policy
+to each request that is parsed.
+
+[source,ts]
+----
+// "acl" is the library you created in the Authorization section:
+import { AclUser } from "acl";
+
+AuthModule.forRootAsync({
+  useFactory: (/* ... */) => {
+    // ...
+    getAcl: (payload) => {
+      if(payload) {
+        const { sub, roles } = payload;
+        const user: AclUser = {
+          kind: "AclUser",
+          id: sub,
+          roles,
+        };
+        return abilityFor(user);
+      }
+      return abilityFor();
+    },
+  },
+})
+----
+
+== Usage
+
+Now any route can use the `@Acl()` decorator to access the `AppAbility` returned by `getAcl()`:
+
+[source,ts]
+----
+import { Controller, Get, Param } from "@nestjs/common";
+import { Action } from "@formulaic/acl";
+import { Acl, CurrentUserId } from "@formulaic/auth-module";
+import { AclComment, AppAbility } from "acl";
+
+@Controller("acl-comment")
+export class AclCommentController {
+
+  public async getComment(
+    @Param("commentId") commentId: string,
+    @CurrentUserId(true) userId?: string,
+    @Acl() acl: AppAbility,
+  ) {
+    const comment: AclComment = {
+      kind: "AclComment",
+      id: "1234",
+      createdById: userId ?? "123",
+      userDeleted: false,
+      staffDeleted: false,
+    }
+
+    if(acl.cannot(Action.BROWSE, comment)) {
+      throw new Error();
+    }
+
+    return comment;
+  }
+
+}
+----
