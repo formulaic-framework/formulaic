@@ -7,7 +7,7 @@ import { AclUser } from "./subjects";
 export function abilityFor(user?: AclUser) {
   const { can, cannot, build } = new AbilityBuilder(AppAbility);
 
-  const roles = user.roles ?? [];
+  const roles = user?.roles ?? [];
   const admin = roles.includes(Role.ADMIN);
   const editor = roles.includes(Role.EDITOR);
   const writer = roles.includes(Role.WRITER);
