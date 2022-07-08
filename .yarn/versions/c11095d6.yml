@@ -1,4 +1,0 @@
-releases:
-  "@formulaic/api": minor
-  "@formulaic/hash": minor
-  server: minor
