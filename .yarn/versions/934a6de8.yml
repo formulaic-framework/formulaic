@@ -1,6 +1,6 @@
 releases:
+  "@formulaic/api": minor
+  "@formulaic/auth-module": minor
+  "@formulaic/data": minor
   "@formulaic/id": minor
   server: minor
-
-undecided:
-  - "@formulaic/api"
