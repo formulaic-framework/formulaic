@@ -1,10 +1,16 @@
 on:
   workflow_dispatch:
     inputs:
-      apply_versions:
+      versioning:
         description: 'Apply new versions?'
-        required: false
-        default: '1'
+        required: true
+        default: 'pre-release'
+        type: choice
+        options:
+          - no
+          - pre-release
+          - full release
+
 
 name: 'Release Candidate'
 jobs:
@@ -46,12 +52,20 @@ jobs:
         yarn workspaces foreach -vpt \
           run build
 
-    - name: 'Generate the release commits'
-      if: ${{fromJSON(github.event.inputs.apply_versions)}}
+    - name: 'Generate the pre-release commits'
+      if: ${{ inputs.versioning == 'pre-release' }}
       run: |
         git config user.name "${{secrets.GH_BOT_NAME}}"
         git config user.email "${{secrets.GH_BOT_EMAIL}}"
         ./scripts/release/01-release-tags.sh --prerelease
+        git push --follow-tags
+
+    - name: 'Generate the release commits'
+      if: ${{ inputs.versioning == 'full release' }}
+      run: |
+        git config user.name "${{secrets.GH_BOT_NAME}}"
+        git config user.email "${{secrets.GH_BOT_EMAIL}}"
+        ./scripts/release/01-release-tags.sh
         git push --follow-tags
 
     - name: 'Upload the releases'
