@@ -25,6 +25,7 @@
   "dependencies": {
     "@formulaic/auth-module": "workspace:^",
     "@formulaic/entity-service": "workspace:^",
+    "@formulaic/hash": "workspace:^",
     "@formulaic/id": "workspace:^",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",

@@ -31,6 +31,11 @@ export {
 } from "@formulaic/entity-service";
 
 export {
+  HashModule,
+  HashService,
+} from "@formulaic/hash";
+
+export {
   IDConfig,
   IDDefinition,
   IDModule,

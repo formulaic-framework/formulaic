@@ -34,6 +34,7 @@
     "@formulaic/auth-module": "workspace:^",
     "@formulaic/data": "workspace:^",
     "@formulaic/entity-service": "workspace:^",
+    "@formulaic/hash": "workspace:^",
     "@formulaic/id": "workspace:^",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"

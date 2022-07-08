@@ -36,7 +36,7 @@ describe('UserService', () => {
 
   describe("buildUser", () => {
     it("generates IDs", async () => {
-      const user = await userService.buildUser("admin");
+      const user = await userService.buildUser("admin", "admin");
       expect(user.id.length).toEqual(MAX_NOLOOKALIKES_SIZE[IDs.user[1]]);
     });
   });
@@ -50,8 +50,8 @@ describe('UserService', () => {
 
     it("can return users", async () => {
       const created = await Promise.all([
-        userService.createUser("test1"),
-        userService.createUser("test2"),
+        userService.createUser("test1", "password"),
+        userService.createUser("test2", "password"),
       ]);
 
       const users = await userService.listAll(true);
