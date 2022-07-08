@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/data",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "packageManager": "yarn@3.2.1",
   "main": "./dist/index.js",
   "scripts": {
