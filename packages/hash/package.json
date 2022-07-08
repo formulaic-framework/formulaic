@@ -1,0 +1,33 @@
+{
+  "name": "@formulaic/hash",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepack": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "packageManager": "yarn@3.2.1",
+  "devDependencies": {
+    "@nestjs/common": "^9.0.1",
+    "@types/bcrypt": "^5.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.5.5",
+    "typescript": "^4.7.4"
+  },
+  "author": {
+    "name": "Flyyn"
+  },
+  "license": "MIT",
+  "repository": {
+    "directory": "packages/hash",
+    "type": "git",
+    "url": "https://github.com/formulaic-framework/formulaic.git"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "*"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1"
+  }
+}

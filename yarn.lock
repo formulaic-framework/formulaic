@@ -604,6 +604,7 @@ __metadata:
     "@formulaic/auth-module": "workspace:^"
     "@formulaic/data": "workspace:^"
     "@formulaic/entity-service": "workspace:^"
+    "@formulaic/hash": "workspace:^"
     "@formulaic/id": "workspace:^"
     "@nestjs/common": ^8.4.7
     "@nestjs/core": ^8.4.7
@@ -657,6 +658,21 @@ __metadata:
     typescript: ^4.7.4
   peerDependencies:
     typeorm: "*"
+  languageName: unknown
+  linkType: soft
+
+"@formulaic/hash@workspace:^, @formulaic/hash@workspace:packages/hash":
+  version: 0.0.0-use.local
+  resolution: "@formulaic/hash@workspace:packages/hash"
+  dependencies:
+    "@nestjs/common": ^9.0.1
+    "@types/bcrypt": ^5.0.0
+    bcrypt: ^5.0.1
+    reflect-metadata: ^0.1.13
+    rxjs: ^7.5.5
+    typescript: ^4.7.4
+  peerDependencies:
+    "@nestjs/common": "*"
   languageName: unknown
   linkType: soft
 
@@ -1171,6 +1187,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nestjs/common@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@nestjs/common@npm:9.0.1"
+  dependencies:
+    iterare: 1.2.1
+    tslib: 2.4.0
+    uuid: 8.3.2
+  peerDependencies:
+    cache-manager: "*"
+    class-transformer: "*"
+    class-validator: "*"
+    reflect-metadata: ^0.1.12
+    rxjs: ^7.1.0
+  peerDependenciesMeta:
+    cache-manager:
+      optional: true
+    class-transformer:
+      optional: true
+    class-validator:
+      optional: true
+  checksum: 3a93824bda59b911dd6d3b4f0f833138dd997b2f330596f0e1bbb76a3a18d82664c8bd75c40f7f9a840e3e83e2db2c2033d0b9d1b667121c2823e9ead1d0b46e
+  languageName: node
+  linkType: hard
+
 "@nestjs/core@npm:^8.0.0, @nestjs/core@npm:^8.4.7":
   version: 8.4.7
   resolution: "@nestjs/core@npm:8.4.7"
@@ -1600,6 +1640,15 @@ __metadata:
   dependencies:
     "@babel/types": ^7.3.0
   checksum: 8992d8c1eaaf1c793e9184b930767883446939d2744c40ea4e9591086e79b631189dc519931ed8864f1e016742a189703c217db59b800aca84870b865009d8b4
+  languageName: node
+  linkType: hard
+
+"@types/bcrypt@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@types/bcrypt@npm:5.0.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 063c32c7a519d64768dfc0169a319b8244d6a6cb50a355c93992b3c5fee1dbc236526a1111f0e7bb25abc8b0473e5f40a5edfeb8b33cad2a6ea35aa2d7d7db14
   languageName: node
   linkType: hard
 
@@ -2839,6 +2888,16 @@ __metadata:
   version: 2.0.0
   resolution: "base64id@npm:2.0.0"
   checksum: 581b1d37e6cf3738b7ccdd4d14fe2bfc5c238e696e2720ee6c44c183b838655842e22034e53ffd783f872a539915c51b0d4728a49c7cc678ac5a758e00d62168
+  languageName: node
+  linkType: hard
+
+"bcrypt@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "bcrypt@npm:5.0.1"
+  dependencies:
+    "@mapbox/node-pre-gyp": ^1.0.0
+    node-addon-api: ^3.1.0
+  checksum: b59625519f2b2891010b8094208588462b1c759ccacebfd74f0b9a4c1885743434ede246c26b615b94a5cf203dfcb9eb25a1e8dec315afd3098da2b848c0fa12
   languageName: node
   linkType: hard
 
@@ -6670,6 +6729,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-addon-api@npm:^3.1.0":
+  version: 3.2.1
+  resolution: "node-addon-api@npm:3.2.1"
+  dependencies:
+    node-gyp: latest
+  checksum: 2369986bb0881ccd9ef6bacdf39550e07e089a9c8ede1cbc5fc7712d8e2faa4d50da0e487e333d4125f8c7a616c730131d1091676c9d499af1d74560756b4a18
+  languageName: node
+  linkType: hard
+
 "node-addon-api@npm:^4.2.0":
   version: 4.3.0
   resolution: "node-addon-api@npm:4.3.0"
@@ -7721,6 +7789,7 @@ __metadata:
   dependencies:
     "@formulaic/auth-module": "workspace:^"
     "@formulaic/entity-service": "workspace:^"
+    "@formulaic/hash": "workspace:^"
     "@formulaic/id": "workspace:^"
     "@nestjs/cli": ^8.0.0
     "@nestjs/common": ^8.0.0
