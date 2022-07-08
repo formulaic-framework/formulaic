@@ -42,6 +42,7 @@ jobs:
 
     - name: 'Build packages'
       run: |
+        yarn
         yarn workspaces foreach -vptR \
           run build
 
