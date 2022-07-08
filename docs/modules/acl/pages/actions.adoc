@@ -1,0 +1,6 @@
+= Define Actions
+
+You should create an enum of actions that the user can execute.
+
+Formulaic provides a set of common actions in `@formulaic/acl` (which is wrapped into `@formulaic/api` and `@formulaic/react`)
+that often meet all the actions you may need.

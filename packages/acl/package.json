@@ -1,0 +1,25 @@
+{
+  "name": "@formulaic/acl",
+  "version": "0.1.0",
+  "packageManager": "yarn@3.2.1",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepack": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  },
+  "author": {
+    "name": "Flyyn"
+  },
+  "license": "MIT",
+  "repository": {
+    "directory": "packages/acl",
+    "type": "git",
+    "url": "https://github.com/codelenny/formulaic.git"
+  }
+}

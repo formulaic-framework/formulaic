@@ -1,3 +1,4 @@
+import { Role } from "acl";
 import { IsString } from "class-validator";
 
 export class JWTPayload {
@@ -8,6 +9,6 @@ export class JWTPayload {
   @IsString({
     each: true,
   })
-  roles: string[];
+  roles: Role[];
 
 }

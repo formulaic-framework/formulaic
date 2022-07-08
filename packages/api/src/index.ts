@@ -1,4 +1,10 @@
 export {
+  AclUser,
+  Action,
+  CRUDAction,
+} from "@formulaic/acl";
+
+export {
   Acl,
   AuthGuard,
   AuthModule,

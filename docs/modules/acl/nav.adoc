@@ -1,0 +1,8 @@
+* xref:index.adoc[]
+** Setup
+*** xref:package.adoc[]
+*** xref:actions.adoc[]
+*** xref:roles.adoc[]
+*** xref:subjects.adoc[]
+*** xref:abilities.adoc[]
+*** xref:rules.adoc[]

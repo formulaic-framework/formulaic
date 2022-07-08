@@ -30,6 +30,7 @@
   },
   "packageManager": "yarn@3.2.1",
   "dependencies": {
+    "@formulaic/acl": "workspace:^",
     "@formulaic/auth-module": "workspace:^",
     "@formulaic/id": "workspace:^",
     "reflect-metadata": "^0.1.13",

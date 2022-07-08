@@ -1,0 +1,17 @@
+= Define Roles
+
+Many components of Formulaic support the notion of user roles,
+although most do not require you to use roles if you don't wish to.
+
+We'd recommend creating an enum of roles:
+
+.`src/role.ts` in ACL package
+[source,ts]
+----
+export enum Role {
+  ADMIN = "admin",
+  EDITOR = "editor",
+  MODERATOR = "moderator",
+  USER = "user",
+}
+----

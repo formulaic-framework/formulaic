@@ -1,6 +1,15 @@
 {
   "name": "@formulaic/react",
   "version": "0.1.0",
+  "main": "./dist/formulaic.umd.js",
+  "module": "./dist/formulaic.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/formulaic.es.js",
+      "require": "./dist/formulaic.umd.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -9,10 +18,13 @@
     "prepublishOnly": "tsc && vite build"
   },
   "dependencies": {
+    "@formulaic/acl": "workspace:^",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "vite-plugin-dts": "^1.2.1"
   },
   "devDependencies": {
+    "@types/node": "^18.0.3",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^1.3.0",
