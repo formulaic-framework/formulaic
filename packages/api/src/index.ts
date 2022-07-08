@@ -22,6 +22,14 @@ export {
   RequireRoles,
 } from "@formulaic/auth-module";
 
+export * from "@formulaic/data";
+
+export {
+  BaseEntityService,
+  CommonEntity,
+  EntityService,
+} from "@formulaic/entity-service";
+
 export {
   IDConfig,
   IDDefinition,

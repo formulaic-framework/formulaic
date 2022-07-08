@@ -4,6 +4,7 @@ title: Formulaic Framework
 nav:
   - modules/start/nav.adoc
   - modules/id/nav.adoc
+  - modules/entity-service/nav.adoc
   - modules/acl/nav.adoc
   - modules/auth/nav.adoc
 

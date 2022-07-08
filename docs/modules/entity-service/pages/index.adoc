@@ -1,0 +1,3 @@
+= Entity Service
+
+Formulaic provides shortcuts for common database actions, with safely typed responses, similar to the typing used by fp-ts.
