@@ -1,0 +1,9 @@
+releases:
+  "@formulaic/api": minor
+  "@formulaic/auth-module": patch
+  "@formulaic/data": minor
+  "@formulaic/entity-service": patch
+  "@formulaic/exception-filter": minor
+  "@formulaic/hash": patch
+  "@formulaic/id": patch
+  server: minor

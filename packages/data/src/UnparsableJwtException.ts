@@ -1,3 +1,5 @@
+import { TaggedType } from "./interface/TaggedType";
+
 export enum UnparsableJwtReason {
   AUTH_HEADER_UNPARSABLE = "auth_header_unparsable",
   NOT_JWT = "not_jwt",
@@ -19,4 +21,8 @@ export class UnparsableJwtException {
     this.reason = reason;
     this.websocket = websocket;
   }
+}
+
+export function isUnparsableJwtException(obj: TaggedType): obj is UnparsableJwtException {
+  return obj.kind === "UnparsableJwtException";
 }

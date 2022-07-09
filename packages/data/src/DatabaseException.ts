@@ -1,3 +1,5 @@
+import { TaggedType } from "./interface/TaggedType";
+
 /**
  * An unexpected and unhandled error thrown by a database.
  */
@@ -26,4 +28,8 @@ export class DatabaseException<ErrorType = any> {
     this.error = error;
   }
 
+}
+
+export function isDatabaseException(data: TaggedType): data is DatabaseException {
+  return data.kind === "DatabaseException";
 }
