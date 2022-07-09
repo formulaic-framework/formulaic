@@ -1,3 +1,5 @@
+import { TaggedType } from "./interface/TaggedType";
+
 export enum InvalidAuthenticationReason {
   EXPIRED = "expired",
 }
@@ -15,5 +17,8 @@ export class InvalidAuthenticationException {
     this.reason = reason;
   }
 
+}
 
+export function isInvalidAuthenticationException(obj: TaggedType): obj is InvalidAuthenticationException {
+  return obj.kind === "InvalidAuthenticationException";
 }

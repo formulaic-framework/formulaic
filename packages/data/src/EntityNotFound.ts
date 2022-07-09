@@ -1,3 +1,5 @@
+import { TaggedType } from "./interface/TaggedType";
+
 export class EntityNotFound<
   EntityName extends string = string,
   FindOptions = any,
@@ -20,4 +22,8 @@ export class EntityNotFound<
     this.findOptions = findOptions;
   }
 
+}
+
+export function isEntityNotFound(obj: TaggedType): obj is EntityNotFound {
+  return obj.kind === "EntityNotFound";
 }

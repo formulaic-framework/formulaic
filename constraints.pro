@@ -19,6 +19,21 @@ gen_enforced_field(WorkspaceCwd, 'author.name', 'Flyyn').
 % and enforce a consistent version.
 gen_enforced_dependency(WorkspaceCwd, 'typescript', '^4.7.4', 'devDependencies').
 
+% enforce a single version of NestJS
+gen_enforced_dependency(WorkspaceCwd, Package, '^9.0.0', DependencyType) :-
+  workspace_has_dependency(WorkspaceCwd, Package, _, DependencyType),
+  atom_concat('@nestjs/', SubPackage, Package),
+  \+ DependencyType = 'peerDependencies',
+  \+ SubPackage = 'swagger'.
+
+gen_enforced_dependency(WorkspaceCwd, Package, '^9.0', 'peerDependencies') :-
+  workspace_has_dependency(WorkspaceCwd, Package, _, 'peerDependencies'),
+  atom_concat('@nestjs/', SubPackage, Package),
+  \+ SubPackage = 'swagger'.
+
+% gen_enforced_dependency(WorkspaceCwd, '@nestjs/core', '^9.0', 'peerDependencies') :-
+%   workspace_has_dependency(WorkspaceCwd, '@nestjs/core', _, 'peerDependencies').
+
 % 'typescript' may only be a dev dependency,
 % and may not exist under any other dependency section.
 gen_enforced_dependency(WorkspaceCwd, 'typescript', null, DependencyType) :-

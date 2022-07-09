@@ -30,6 +30,8 @@ export {
   EntityService,
 } from "@formulaic/entity-service";
 
+export * from "@formulaic/exception-filter";
+
 export {
   HashModule,
   HashService,
