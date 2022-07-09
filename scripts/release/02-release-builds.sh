@@ -32,4 +32,4 @@ fi
 
 yarn workspaces foreach \
   --verbose --topological --no-private "${RELEASE_ARGUMENTS[@]}" \
-  npm publish --tolerate-republish
+  npm publish --tolerate-republish --access public
