@@ -45,7 +45,16 @@ describe('UserService', () => {
 
   describe("listAll", () => {
 
-    it("returns nothing without users", async () => {
+    it("returns nothing without users (required=false)", async () => {
+      expect.assertions(2);
+      const users = await userService.listAll();
+      expect(users.kind).toBe("Data");
+      if(users.hasData === true) {
+        expect(users.data.length).toBe(0);
+      }
+    });
+
+    it("returns nothing without users (required=true)", async () => {
       const users = await userService.listAll(true);
       expect(users.length).toBe(0);
     });

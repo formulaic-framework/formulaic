@@ -32,9 +32,9 @@
   "dependencies": {
     "@formulaic/acl": "workspace:^",
     "@formulaic/auth-module": "workspace:^",
-    "@formulaic/data": "workspace:^",
     "@formulaic/entity-service": "workspace:^",
-    "@formulaic/exception-filter": "workspace:^",
+    "@formulaic/fp": "workspace:^",
+    "@formulaic/fp-interceptor": "workspace:^",
     "@formulaic/hash": "workspace:^",
     "@formulaic/id": "workspace:^",
     "reflect-metadata": "^0.1.13",

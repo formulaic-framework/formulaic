@@ -1,3 +1,5 @@
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
 import { NotFound } from "./NotFound";
 
 /**
@@ -7,10 +9,24 @@ import { NotFound } from "./NotFound";
  * In production, {@link EntityNotFound} is configured to hide the difference between
  * missing entities and permission errors, exposing both as a minimal {@link NotFound} response.
  */
-export class EntityNotFound<T, EntityName extends string> extends NotFound<T, EntityName> {
+export class EntityNotFound<
+  EntityName extends string = string,
+  FindOptions = any,
+  T = any,
+> extends NotFound<T, EntityName> {
 
-  public constructor(entityName: EntityName) {
+  @ApiPropertyOptional()
+  @Expose({
+    groups: ["debug"]
+  })
+  public readonly findOptions?: FindOptions;
+
+  public constructor(
+    entityName: EntityName,
+    findOptions?: FindOptions,
+  ) {
     super(entityName, false);
+    this.findOptions = findOptions;
   }
 
 }
