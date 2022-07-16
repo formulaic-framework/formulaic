@@ -2,8 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { HttpAdapterHost } from '@nestjs/core';
-import { ApiExceptionFilter } from '@formulaic/exception-filter';
+import { FPInterceptor } from '@formulaic/fp-interceptor';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -14,8 +13,7 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    const httpHost = app.get(HttpAdapterHost);
-    app.useGlobalFilters(new ApiExceptionFilter(httpHost));
+    app.useGlobalInterceptors(new FPInterceptor());
     await app.init();
   });
 
@@ -26,15 +24,16 @@ describe('AppController (e2e)', () => {
       .expect('Hello World!');
   });
 
-  it("maps exceptions (AccessForbiddenException -> ForbiddenResponse)", async () => {
-    const res = await request(app.getHttpServer())
-      .get("/throw-access-forbidden")
-      .expect(403)
-      .expect({
-        kind: "ForbiddenResponse",
-        statusCode: 403,
-        message: "Forbidden",
-      });
+  it("hides AccessForbidden/EntityNotFound", async () => {
+    const forbidden = await request(app.getHttpServer())
+      .get("/access-forbidden")
+      .expect(200);
+
+    const notFound = await request(app.getHttpServer())
+      .get("/entity-not-found")
+      .expect(200);
+
+    expect(forbidden.body).toStrictEqual(notFound.body);
   });
 
 });

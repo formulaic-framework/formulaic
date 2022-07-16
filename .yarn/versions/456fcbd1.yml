@@ -1,0 +1,9 @@
+releases:
+  "@formulaic/api": major
+  "@formulaic/entity-service": major
+  "@formulaic/fp": minor
+  "@formulaic/fp-interceptor": minor
+  server: minor
+
+undecided:
+  - acl

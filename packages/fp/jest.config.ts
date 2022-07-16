@@ -1,0 +1,7 @@
+export default {
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  preset: "ts-jest",
+  testEnvironment: "node",
+  verbose: true,
+};

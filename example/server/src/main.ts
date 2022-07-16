@@ -1,11 +1,10 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { ApiExceptionFilter } from "@formulaic/exception-filter";
+import { NestFactory } from '@nestjs/core';
+import { FPInterceptor } from "@formulaic/fp-interceptor";
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const httpHost = app.get(HttpAdapterHost);
-  app.useGlobalFilters(new ApiExceptionFilter(httpHost));
+  app.useGlobalInterceptors(new FPInterceptor());
   await app.listen(3000);
 }
 bootstrap();

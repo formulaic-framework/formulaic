@@ -23,10 +23,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand"
   },
   "dependencies": {
+    "@formulaic/acl": "workspace:^",
     "@formulaic/auth-module": "workspace:^",
-    "@formulaic/data": "workspace:^",
     "@formulaic/entity-service": "workspace:^",
-    "@formulaic/exception-filter": "workspace:^",
+    "@formulaic/fp": "workspace:^",
+    "@formulaic/fp-interceptor": "workspace:^",
     "@formulaic/hash": "workspace:^",
     "@formulaic/id": "workspace:^",
     "@nestjs/common": "^9.0.0",

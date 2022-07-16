@@ -92,12 +92,21 @@ jobs:
       with:
         node-version: ${{matrix.node}}.x
 
-    - name: 'Run the server tests'
+    - name: 'Install dependencies'
       run: |
         yarn --immutable
+      shell: bash
+
+    - name: 'Build projects'
+      run: |
         yarn workspaces foreach -vptR \
-          --from server \
+          --from '{server,@formulaic/fp}' \
           run build
+      shell: bash
+
+    - name: 'Run test suites tests'
+      run: |
+        yarn workspace @formulaic/fp test
         yarn workspace server test
         yarn workspace server test:e2e
       shell: bash
