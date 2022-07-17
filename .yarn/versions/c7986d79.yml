@@ -1,0 +1,4 @@
+releases:
+  "@formulaic/api": patch
+  "@formulaic/entity-service": patch
+  server: patch
