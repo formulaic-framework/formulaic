@@ -1,6 +1,7 @@
 export { Data } from "./base/Data";
 export { FP, isFP } from "./base/FP";
 export { NoData } from "./base/NoData";
+export { NonData } from "./base/NonData";
 export { AccessForbidden } from "./AccessForbidden";
 export { DatabaseException } from "./DatabaseException";
 export { EntityNotFound } from "./EntityNotFound";

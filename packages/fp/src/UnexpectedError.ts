@@ -1,13 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose, Transform } from "class-transformer";
 import { serializeError } from "serialize-error";
-import { FP } from "./base/FP";
+import { NonData } from "./base/NonData";
 
 /**
  * Describes unexpected encountered on the server-side.
  * This is a catch-all equivalent for a 500 Internal Server Error.
  */
-export class UnexpectedError<T, Err = any> extends FP<T> {
+export class UnexpectedError<T, Err = any> extends NonData<T> {
+  public static readonly kind = "UnexpectedError";
 
   @ApiProperty()
   @Expose()
@@ -29,14 +30,6 @@ export class UnexpectedError<T, Err = any> extends FP<T> {
   })
   public readonly code?: string;
 
-  @ApiProperty()
-  @Expose()
-  public override readonly hasData: false;
-
-  @ApiProperty()
-  @Expose()
-  public override readonly noValue: false;
-
   public readonly error?: Err;
 
   @ApiPropertyOptional()
@@ -53,8 +46,6 @@ export class UnexpectedError<T, Err = any> extends FP<T> {
     this.kind = "UnexpectedError";
     this.status = 500;
     this.code = code;
-    this.hasData = false;
-    this.noValue = false;
     this.error = error;
     this.serializedError = error ? JSON.stringify(serializeError(error)) : undefined;
   }
