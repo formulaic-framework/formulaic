@@ -12,11 +12,11 @@ export class EntityService<
 > extends BaseEntityService<T, EntityName> {
 
   public async findById(id: T["id"], required: true): Promise<T>;
-  public async findById(id: T["id"]): Promise<Data<T> | EntityNotFound<EntityName, FindOneOptions<T>> | DatabaseException<T, "findOne">>;
+  public async findById(id: T["id"]): Promise<Data<T> | EntityNotFound<EntityName, FindOneOptions<T>, T> | DatabaseException<T, "findOne">>;
   public async findById(
     idValue: T["id"],
     required?: true,
-  ): Promise<T | Data<T> | EntityNotFound<EntityName, FindOneOptions<T>> | DatabaseException<T, "findOne">> {
+  ): Promise<T | Data<T> | EntityNotFound<EntityName, FindOneOptions<T>, T> | DatabaseException<T, "findOne">> {
     const id = idValue as FindOptionsWhereProperty<NonNullable<T["id"]>>;
     const where = { id } as FindOptionsWhere<T>;
     return this.findOne({ where }, required);
