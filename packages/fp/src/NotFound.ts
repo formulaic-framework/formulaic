@@ -7,6 +7,8 @@ import { NoData } from "./base/NoData";
  * or that the user lacks permission to view.
  */
 export class NotFound<T, EntityName extends string> extends NoData<T> {
+  public static readonly kind = "NotFound";
+
   public override readonly kind: "NotFound";
 
   /**

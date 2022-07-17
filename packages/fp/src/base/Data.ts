@@ -1,6 +1,8 @@
 import { FP, isFP } from "./FP";
 
 export class Data<T> extends FP<T> {
+  public static readonly kind = "Data";
+
   public override readonly status: 200 | 201;
   public override readonly kind: "Data";
   public override readonly hasData: true;
