@@ -59,6 +59,12 @@ describe("FP", () => {
       expect(y.kind).toBe("Data");
     });
 
+    it("can filter multiple", () => {
+      const x = new Data(10) as Data<number> | AccessForbidden<number, "Number"> | DatabaseException<number, "find">;
+      const y = x.mapUnless(["Data", "DatabaseException"], () => new Data("Hi"));
+      expect(y.data).toBe(10);
+    });
+
   });
 
 });
