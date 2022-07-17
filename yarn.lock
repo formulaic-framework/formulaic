@@ -666,6 +666,7 @@ __metadata:
     typescript: ^4.7.4
   peerDependencies:
     "@nestjs/common": ^9.0
+    "@nestjs/core": ^9.0
     rxjs: "*"
   languageName: unknown
   linkType: soft

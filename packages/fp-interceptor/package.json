@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/fp-interceptor",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "commonjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -27,6 +27,7 @@
   },
   "peerDependencies": {
     "@nestjs/common": "^9.0",
+    "@nestjs/core": "^9.0",
     "rxjs": "*"
   },
   "dependencies": {
