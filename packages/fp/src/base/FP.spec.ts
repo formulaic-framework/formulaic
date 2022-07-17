@@ -5,7 +5,7 @@ import { isFP } from "./FP";
 
 describe("FP", () => {
 
-  describe("mapIf", () => {
+  describe("mapIf()", () => {
 
     it("maps data", () => {
       const x = new Data(10);
@@ -40,6 +40,22 @@ describe("FP", () => {
     it("handles non-matching cases", () => {
       const x = new Data(10);
       const y = x.mapIf("Foo", () => new DatabaseException("find"));
+      expect(y.kind).toBe("Data");
+    });
+
+  });
+
+  describe("mapUnless()", () => {
+
+    it("maps if type doesn't match", () => {
+      const x = new Data(10);
+      const y = x.mapUnless(AccessForbidden, x => x.data + 1);
+      expect(y.data).toBe(11);
+    });
+
+    it("can filter types", () => {
+      const x = new Data(10) as Data<number> | AccessForbidden<number, "Number">;
+      const y = x.mapUnless(Data, () => new DatabaseException("find"));
       expect(y.kind).toBe("Data");
     });
 
