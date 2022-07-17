@@ -1,0 +1,4 @@
+releases:
+  "@formulaic/api": patch
+  "@formulaic/fp-interceptor": patch
+  server: patch
