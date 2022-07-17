@@ -1,7 +1,5 @@
-import { ApiResponseOptions, getSchemaPath } from "@nestjs/swagger";
-import { Data } from "../base/Data";
-import { FP } from "../base/FP"
-import { MissingPermission } from "../MissingPermission";
+import { ApiResponseSchemaHost, getSchemaPath } from "@nestjs/swagger";
+import { FP } from "../base/FP";
 
 export type FPConstructor<Kind extends string, T extends FP<any>> = {
   kind: Kind;
@@ -24,7 +22,7 @@ export type FPConstructor<Kind extends string, T extends FP<any>> = {
  *
  * }
  */
-export function oneOfFP(responses: FPConstructor<string, any>[]): ApiResponseOptions {
+export function oneOfFP(responses: FPConstructor<string, any>[]): ApiResponseSchemaHost {
   return {
     schema: {
       oneOf: responses.map(response => ({
@@ -40,8 +38,3 @@ export function oneOfFP(responses: FPConstructor<string, any>[]): ApiResponseOpt
     },
   };
 }
-
-oneOfFP([
-  Data,
-  MissingPermission,
-])
