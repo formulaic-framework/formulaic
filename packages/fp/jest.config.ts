@@ -3,5 +3,6 @@ export default {
   coverageDirectory: "coverage",
   preset: "ts-jest",
   testEnvironment: "node",
+  testRegex: ".spec.ts$",
   verbose: true,
 };

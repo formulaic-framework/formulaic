@@ -9,6 +9,8 @@ import { FP } from "./base/FP";
  * revealing the existence of hidden information.
  */
 export class MissingPermission<T> extends FP<T> {
+  public static readonly kind = "MissingPermission";
+
   @ApiProperty()
   public override readonly kind: "MissingPermission";
 

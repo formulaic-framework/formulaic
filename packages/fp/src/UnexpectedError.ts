@@ -8,6 +8,7 @@ import { NonData } from "./base/NonData";
  * This is a catch-all equivalent for a 500 Internal Server Error.
  */
 export class UnexpectedError<T, Err = any> extends NonData<T> {
+  public static readonly kind = "UnexpectedError";
 
   @ApiProperty()
   @Expose()
