@@ -1,4 +1,9 @@
-import { FP, isFP } from "./FP";
+import { EnsureData, FP, isFP } from "./FP";
+
+type DataMapData<T, ThisType extends Data<T>, O>
+  = ThisType extends Data<T>
+    ? EnsureData<O>
+    : ThisType;
 
 export class Data<T> extends FP<T> {
   public static readonly kind = "Data";
@@ -20,13 +25,23 @@ export class Data<T> extends FP<T> {
     this.data = value;
   }
 
-  public override mapData<O>(fn: (input: T) => O): (this extends Data<T> ? (O extends { kind: string } ? O : Data<O>) : this) {
+  public override mapData<O>(fn: (input: T) => O): DataMapData<T, this, O> {
     const previousValue = this.data;
     const updatedValue = fn(previousValue);
     if(isFP(updatedValue)) {
-      return updatedValue as (this extends Data<T> ? (O extends { kind: string } ? O : Data<O>) : this);
+      return updatedValue as DataMapData<T, this, O>;
     } else {
-      return new Data(updatedValue) as (this extends Data<T> ? (O extends { kind: string } ? O : Data<O>) : this);
+      return new Data(updatedValue) as DataMapData<T, this, O>;
+    }
+  }
+
+  public override async mapDataAsync<O>(fn: (input: T) => Promise<O>): Promise<DataMapData<T, this, O>> {
+    const previousValue = this.data;
+    const updatedValue = await fn(previousValue);
+    if(isFP(updatedValue)) {
+      return updatedValue as DataMapData<T, this, O>;
+    } else {
+      return new Data(updatedValue as T) as DataMapData<T, this, O>;
     }
   }
 

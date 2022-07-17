@@ -7,6 +7,8 @@ export type MapFPIf<ThisType extends FP<any>, K extends string, O> = ThisType ex
 
 export type MapFPUnless<ThisType extends FP<any>, K extends string, O> = ThisType extends { kind: K } ? ThisType : EnsureData<O>;
 
+export type MapFPData<T, ThisType extends FP<T>, O> = ThisType extends Data<T> ? EnsureData<O> : ThisType;
+
 export abstract class FP<T> {
   public abstract readonly status: number;
   public abstract readonly kind: string;
@@ -61,8 +63,15 @@ export abstract class FP<T> {
    * Perform a data-transformation if data is available ({@link hasData}),
    * retaining the original data if data is not available.
    */
-  public mapData<O>(fn: (input: T) => O): (this extends Data<T> ? (O extends { kind: string } ? O : Data<O>) : this) {
-    return this as (this extends Data<T> ? (O extends { kind: string } ? O : Data<O>) : this);
+  public mapData<O>(fn: (input: T) => O): MapFPData<T, this, O> {
+    return this as MapFPData<T, this, O>;
+  }
+
+  /**
+   * Promise-version of {@link mapData}
+   */
+  public mapDataAsync<O>(fn: (input: T) => Promise<O>): Promise<MapFPData<T, this, O>> {
+    return Promise.resolve(this) as Promise<MapFPData<T, this, O>>;
   }
 
   /**
