@@ -99,4 +99,13 @@ export class BaseEntityService<
     }
   }
 
+  protected async save(unsaved: T): Promise<Data<T> | DatabaseException<T, "save">> {
+    try {
+      const saved = await this.repo.save(unsaved);
+      return new Data(saved);
+    } catch (e) {
+      return new DatabaseException("save", e);
+    }
+  }
+
 }

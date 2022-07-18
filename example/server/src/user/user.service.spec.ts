@@ -65,6 +65,9 @@ describe('UserService', () => {
         userService.createUser("test2", "password"),
       ]);
 
+      expect(created[0].kind).toBe("Data");
+      expect(created[1].kind).toBe("Data");
+
       const users = await userService.listAll(true);
       expect(users.length).toBe(2);
     });
