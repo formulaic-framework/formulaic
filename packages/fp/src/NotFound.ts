@@ -9,6 +9,8 @@ import { NoData } from "./base/NoData";
 export class NotFound<T, EntityName extends string> extends NoData<T> {
   public static readonly kind = "NotFound";
 
+  @ApiProperty()
+  @Expose()
   public override readonly kind: "NotFound";
 
   /**
