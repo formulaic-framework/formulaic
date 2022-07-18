@@ -1,4 +1,0 @@
-releases:
-  "@formulaic/api": minor
-  "@formulaic/entity-service": minor
-  server: patch
