@@ -1,6 +1,0 @@
-releases:
-  "@formulaic/api": patch
-  "@formulaic/entity-service": patch
-  "@formulaic/fp": patch
-  "@formulaic/fp-interceptor": patch
-  server: patch
