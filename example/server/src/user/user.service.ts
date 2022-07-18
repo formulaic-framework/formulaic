@@ -1,4 +1,5 @@
 import { EntityService } from "@formulaic/entity-service";
+import { Data, DatabaseException } from "@formulaic/fp";
 import { HashService } from "@formulaic/hash";
 import { IDService } from "@formulaic/id";
 import { Injectable } from "@nestjs/common";
@@ -19,9 +20,9 @@ export class UserService extends EntityService<User> {
     super("User", users);
   }
 
-  public async createUser(username: string, password: string): Promise<User> {
+  public async createUser(username: string, password: string) {
     const user = await this.buildUser(username, password);
-    return this.users.save(user);
+    return this.save(user);
   }
 
   public async buildUser(
