@@ -50,4 +50,14 @@ describe("Data", () => {
 
   });
 
+  describe("substituteAsync()", () => {
+
+    it("returns the existing data", async () => {
+      const num = new Data(10);
+      const afterSub = await num.substituteAsync(async () => -1);
+      expect(afterSub.data).toBe(10);
+    });
+
+  })
+
 });

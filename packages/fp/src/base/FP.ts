@@ -94,6 +94,17 @@ export abstract class FP<T> {
     return this as (this extends NoData<T> ? Data<T> : this);
   }
 
+  /**
+   * Provide an asynchronous way of obtaining a backup value that should be used if an operation
+   * specifically reported that a value was missing.
+   *
+   * This does not change the result if an error was thrown - use {@link or()} instead to replace
+   * any non-successful result.
+   */
+  public substituteAsync<O>(fn: () => Promise<O>): Promise<this extends NoData<T> ? EnsureData<O> : this> {
+    return Promise.resolve(this) as Promise<this extends NoData<T> ? EnsureData<O> : this>;
+  }
+
 }
 
 export function isFP<T>(value: any): value is FP<T> {
