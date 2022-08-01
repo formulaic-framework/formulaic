@@ -1,0 +1,59 @@
+= Importing the Auth Module
+
+You should add the `AuthModule` in your AppModule to enable it globally.
+
+There are a few different components that you should configure:
+
+- Validation of requests, to ensure JWTs are correctly signed
+- Extracting various details from JWTs to enable decorators and basic authentication flows
+- Creating ACL objects for more complex authorization usage
+
+You may choose to omit the ACL configuration if you are not using it.
+
+.`src/app.module.ts`
+[source,typescript]
+----
+import { AuthModule } from "@formulaic/auth-module";
+// ... existing imports
+import { abilityFor, AclUser } from "acl";
+import { JWTPayload } from "./user/dto/jwt-payload";
+
+@Module({
+  imports: [
+    // ... existing imports
+    AuthModule.forRootAsync({
+      global: true,
+      imports: [], // <.>
+      inject: [],
+      useFactory: () => ({
+        secretOrPublicKey: "test",
+        defaultPolicy: "allow",
+        payload: JWTPayload, // <.>
+        userId: ({ sub }) => sub, // <.>
+        getUserById: id => null, // <.>
+        getRoles: ({ roles }) => roles, // <.>
+        getAcl: (payload) => { // <.>
+          if(!payload) {
+            return abilityFor();
+          }
+          const { sub, roles } = payload;
+          const user: AclUser = {
+            kind: "AclUser",
+            id: sub,
+            roles,
+          };
+          return abilityFor(user);
+        }
+      }),
+    }),
+  ],
+})
+export class AppModule {}
+----
+<.> You may wish to import a configuration module
+<.> If you have defined the JWT payload structure using `class-validator`, requests will be validated to ensure they match the expected structure.
+<.> Provide a function to extract the user ID from a JWT
+<.> Most requests can use the JWT payload without querying the database, however you may wish
+to fetch the entire object if a request needs it.
+<.> Extract the list of roles from the JWT payload.
+<.> If you are using an authorization library (like {casl}), you can construct data for each request.

@@ -1,0 +1,29 @@
+= ID Generator Setup
+
+The ID generator will need to be configured with the different ID formats you plan to generate.
+
+We recommend creating a project-wide configuration file, `id.ts`.
+
+.`src/id.ts`
+[source,typescript]
+----
+// import { IDConfig } from "@formulaic/id";
+// export const IDs: IDConfig = { <.>
+
+export const IDs = {
+
+  article: "uuid", // <.>
+
+  draft: ["alphanumeric", 12], // <.>
+
+  user: ["safe", "millions"], // <.>
+
+} as const;
+
+export type ID = typeof IDs;
+----
+<.> During development, adding a type-hint `: IDConfig` will enable auto-complete of ID formats.
+However, you should remove the hint when you use the library.
+<.> Articles will be assigned IDs using UUIDv4.
+<.> Drafts will be given NanoIDs using 12 alphanumeric characters.
+<.> Users will be given lookalike safe and SFW IDs, using the `"millions"` shortcut to ensure we can create millions of users before reaching a 1% chance of collision.

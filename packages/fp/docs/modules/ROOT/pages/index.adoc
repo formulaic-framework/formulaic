@@ -1,0 +1,76 @@
+= Formulaic's Data Types (FP)
+
+====
+Available on NPM as `@formulaic/fp`
+====
+
+Most Formulaic packages use a {functional}[functional] approach to handling data,
+taking inspiration from {fp-ts} and other languages which support complex return types.
+
+.Demo of `@formulaic/fp` features
+[source,ts]
+----
+import {
+  AccessForbidden,
+  Data,
+  EntityNotFound,
+  NotFound,
+} from "@formulaic/fp";
+import { ApiProperty } from "@nestjs/swagger";
+import { Expose, instanceToPlain } from "class-transformer";
+
+class SecureNote {
+  @ApiProperty()
+  @Expose() // <.>
+  kind: "SecureNote";
+
+  /**
+   * A unique identifier.
+   */
+  @ApiProperty()
+  @Expose()
+  id: string;
+  /**
+   * A list of usernames that can read this file.
+   */
+  canRead: string[];
+  /**
+   * The contents of the note.
+   */
+  @ApiProperty()
+  @Expose()
+  message: string;
+}
+
+var notes: SecureNote[] = [ /* ... */ ];
+
+async function getNote(
+  username: string,
+  noteId: string,
+): Promise<Data<SecureNote> | NotFound<SecureNote, "Note">> {
+  const note = notes.find(note => note.id = noteId);
+  if(!note) {
+    return new EntityNotFound("Note", { id });
+  }
+  if(!note.canRead.includes(username)) {
+    return new AccessForbidden("Note");
+  }
+  return new Data(note);
+}
+
+async function main() {
+  const note = await getNote("test", "myNote123");
+  const modified = note.mapData(data => data); // <.>
+  const formatted = instanceToPlain(modified, {
+    groups: [
+      "structure",
+      // "exposeForbidden", // <.>
+    ],
+  );
+  // => SecureNote { kind: "SecureNote", id, message } or
+  // => NotFound { kind: "NotFound", status: 404, entityName: "Note" }
+}
+----
+<.> `@Expose` will be used by `class-transformer` to filter output
+<.> `@formulaic/fp` includes utilities like `.mapData` which can alter successful values - this is similar to `Promise.then`.
+<.> `@formulaic/fp` built-in types come configured for `class-transformer` - unless you provide either `"exposeForbidden"` or `"debug"`, `AccessForbidden` and `EntityNotFound` will appear to the user as the same object for security.

@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "prepack": "tsc",
-    "prepublishOnly": "tsc"
+    "prepublishOnly": "tsc",
+    "update-local": "yawn set docs/antora.yml version $(yawn get package.json version)"
   },
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
@@ -13,7 +14,8 @@
     "@types/bcrypt": "^5.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "yawn-yaml-cli": "^1.0.1"
   },
   "author": {
     "name": "Flyyn"

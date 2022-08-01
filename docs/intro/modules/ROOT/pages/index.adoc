@@ -1,0 +1,62 @@
+= Formulaic Framework
+
+{formulaic} is a collection of {nest} modules and {react} components
+for building web applications.
+
+Formulaic libraries are built to work independently of one another,
+yet integrate nicely if you use multiple components together.
+
+Formulaic contains modules and components that Flyyn has built into
+many Nest and React applications, and have been abstracted into this
+namespace to be reusable.
+
+== Project Setup
+
+We recommend using Formulaic in a {yarn} (version 2+, "Berry") {yarn-workspaces}[monolithic repository],
+with a standard Nest server and a React application created with {vite}.
+
+.Example repository initialization
+[source,bash]
+----
+mkdir ~/Documents/my-app/
+cd ~/Documents/my-app/
+
+git init --initial-branch=main
+yarn init -w -2
+
+cd packages/
+
+# Create a Nest server - this example uses the Nest CLI to initialize
+# the package with a basic Nest boilerplate.
+npx @nestjs/cli new "my-server"
+cd my-server
+rm -rf .git
+yarn add @nestjs/swagger @nestjs/typeorm typeorm express
+yarn add --dev webpack
+
+# Create a React application using Vite
+cd ../
+yarn create vite --template react-ts my-app
+----
+
+== Installation
+
+Formulaic is composed of a number of independent packages, all available on NPM
+under the `@formulaic` namespace.
+
+You can install each package individually, or you can install a meta-package
+that includes all of the Formulaic packages.
+
+.Install Server Bundle
+[source,sh]
+----
+cd packages/my-server/
+yarn add @formulaic/api
+----
+
+.Install React Bundle
+[source,sh]
+----
+cd packages/my-app/
+yarn add @formulaic/react
+----

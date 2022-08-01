@@ -1,0 +1,29 @@
+= Define ACL Subjects
+
+You'll want to describe the objects that you'll write permission rules about,
+including the description of users.
+
+Formulaic follows a pattern where each subject is prefixed with "ACL", which makes it clear
+that objects are ACL interfaces.
+
+.`src/subjects.ts`
+[source,typescript]
+----
+import { AclUser as BaseAclUser } from "@formulaic/acl";
+import { Role } from "./role";
+
+export enum Subject {
+  AclPost = "AclPost",
+  AclUser = "AclUser",
+}
+
+export class AclUser extends BaseAclUser<Role> {
+}
+
+export class AclPost {
+  public readonly kind: Subject.AclPost;
+  public readonly id: string;
+  public readonly published: boolean;
+  public readonly authorId: string;
+}
+----

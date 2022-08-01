@@ -1,0 +1,90 @@
+= ID Generator Usage
+
+== Root Module Installation
+
+First, install the ID module in your application.
+
+.`src/app.module.ts`
+[source,typescript]
+----
+import { IDModule } from "@formulaic/id";
+import { Module } from "@nestjs/common";
+import { IDs } from "./id";
+
+@Module({
+  imports: [
+    IDModule.forRoot({
+      ids: IDs,
+    }),
+  ],
+})
+export class AppModule {}
+----
+
+== Feature Module Installation
+
+Also add the ID Module to any modules that will use it.
+The following example uses the `UserModule` started in the xref:entity-service::usage.adoc[docs for `@formulaic/entity-service`].
+
+.`src/user/user.module.ts`
+[source,typescript]
+----
+import { IDModule } from "@formulaic/id";
+import { Module } from "@nestjs/common";
+import { TypeORMModule } from "@nestjs/typeorm";
+import { User } from "./user.entity";
+import { UserService } from "./user.service";
+
+@Module({
+  imports: [
+    TypeORMModule.forFeature([ User ]),
+    IDModule,
+  ],
+  providers: [
+    UserService,
+  ],
+})
+export class UserModule {}
+----
+
+== Usage in Service
+
+Finally, you can use the module in your services.
+
+[source,typescript]
+----
+import { HashService } from "@formulaic/hash";
+import { IDService } from "@formulaic/id";
+import { ID } from "../id";
+// ... existing imports
+
+@Injectable()
+export class UserService extends EntityService<User> {
+
+  public constructor(
+    private readonly hash: HashService,
+    private readonly id: IDService<ID>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
+  ) {
+    super("User", users);
+  }
+
+  public async createUser(
+    username: string,
+    password: string,
+    name?: string,
+    isAdmin: boolean = false,
+  ) {
+    const user = new User();
+    user.id = await this.id.id("user"); // <.>
+    user.username = username;
+    user.password = await this.hash.hash(password);
+    user.name = name;
+    user.isAdmin = isAdmin;
+    return this.save(user);
+  }
+
+}
+----
+<.> Simply call `id` to generate IDs.

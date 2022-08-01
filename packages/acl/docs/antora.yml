@@ -1,0 +1,7 @@
+name: acl
+version: 1.0.0
+title: Authorization (ACL) Utilities
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+  - modules/package/nav.adoc

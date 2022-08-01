@@ -1,0 +1,10 @@
+name: hash
+version: 0.5
+title: Hashing Module
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    bcrypt: https://www.npmjs.com/package/bcrypt[bcrypt]

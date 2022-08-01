@@ -1,0 +1,51 @@
+= Creating Custom Data Classes
+
+xref:index.adoc[FP] can be extended to represent your own data.
+
+For general data, you should extend `NonData` - the name is misleading,
+but represents successful data that does not extend the `Data` class.
+
+.`src/user/dto/user-details.ts`
+[source,typescript]
+----
+import { NonData } from "@formulaic/fp";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
+import { Equals, IsString } from "class-validator";
+import { User } from "../user.entity"; // <.>
+
+export class UserDetails<T = any> extends NonData<T> {
+  public static readonly kind = "UserDetails";
+
+  @ApiProperty()
+  @Equals("UserDetails")
+  @Expose()
+  public override readonly kind: "UserDetails";
+
+  @ApiProperty()
+  @Expose()
+  public override readonly status: 200 | 201;
+
+  @ApiProperty()
+  @IsString()
+  @Expose()
+  public readonly id: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @Expose()
+  public readonly name: string;
+
+  public constructor(user: User, created = false) {
+    super();
+    this.kind = "UserDetails";
+    this.status = created ? 201 : 200;
+    this.id = user.id;
+    this.name = user.name;
+  }
+
+}
+----
+<.> The `User` TypeORM entity was created in xref:entity-service::usage.adoc#entity[Formulaic's entity-service documentation]
+
+You likely will want to add additional properties to the object, and add constructor parameters to set them.

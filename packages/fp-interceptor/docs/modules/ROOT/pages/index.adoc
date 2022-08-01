@@ -1,0 +1,53 @@
+= FP Interceptor
+
+Formulaic's xref:fp::index.adoc[data types library (FP)] can be used just on the backend for internal structure,
+but it excels when used to format outgoing responses in conjunction with the FP Interceptor.
+
+The `FPInterceptor` simply intercepts outgoing responses, and uses {fp}, `class-validator`, and `class-transformer` methods under the hood to filter, transform, and format outgoing responses.
+
+== Background
+
+Formulaic's FP library defines an standardized object structure
+that makes it easy and safe to work with data,
+both at compile time through type statements, and also contains data inside objects that
+allows for run-time type checking and discrimination of data types.
+
+Learn more about FP in the xref:fp::index.adoc[FP module documentation].
+
+== Features
+
+=== Easy Flow Control
+
+FP provides great control over data flow, with strongly typed data, even in places where JavaScript/TypeScript throws away type data (Promise rejection, `try/catch` error statements),
+and comes with utilities like `unless`, `mapIf`, and more that allow easy implementation of default values and error recovery backup flows.
+
+=== Strongly Typed Client Generation
+
+Many OpenAPI client generators do not type error responses, likely because rejected Promises and
+`catch` statements have no easy way to be strongly typed.
+
+{fp} allows for all data to be transmitted as success data (documented as a union type in OpenAPI),
+and makes it easy to distinguish success cases from various error causes on the front-end.
+
+=== Better Debug Data Visibility
+
+There are many places where the backend holds data that would be useful for developers,
+yet presents privacy or security risks to share with the user.
+
+FP Interceptor makes use of `class-transformer` under the hood, configured to strip out any data
+not explicitly marked as information to send to the client.
+
+This enables a number of benefits when using `FPInterceptor`:
+
+==== Improved Log Output
+
+Error responses, like `DatabaseException`, can include the entire exception message
+and stacktrace to be included in logs, without the user seeing the cause.
+
+==== Dev-Only Output
+
+`FPInterceptor` uses `class-transformer` configuration (namely, groups), to transform
+and conditionally include information in responses.
+
+By default, `FPInterceptor` uses the `NODE_ENV` environment variable, and will automatically
+include more verbose information if the server is explicitly running in `"development"` mode.

@@ -1,0 +1,249 @@
+= Entity Service Usage
+
+.Full `EntityService` vs `BaseEntityService`
+[NOTE]
+====
+`@formulaic/entity-service` ships with two different services you can extend.
+
+The `BaseEntityService` includes a core set of utilities that can operate on any data.
+
+`EntityService` extends the `BaseEntityService` and makes some basic assumptions about data -
+namely, assuming that every entity has a unique `id` field, which powers some extremely useful
+methods like `getById`.
+
+Assuming your entities have an `id` field, we highly recommend using the full `EntityService`.
+Otherwise, use `BaseEntityService`.
+
+The first parts of this page will be applicable to both `EntityService` and `BaseEntityService`,
+and we will provide a note when using utilities that are only available under `EntityService`.
+====
+
+[#module]
+== Module Assumptions
+
+The `EntityService` assumes you are in a Nest environment, using a TypeORM {typeorm-repo},
+inside a module that looks something like:
+
+.`src/user/user.module.ts`
+[source,typescript]
+----
+import { Module } from "@nestjs/common";
+import { TypeORMModule } from "@nestjs/typeorm";
+import { User } from "./user.entity";
+import { UserService } from "./user.service";
+
+@Module({
+  imports: [
+    TypeORMModule.forFeature([ User ]),
+  ],
+  providers: [
+    UserService,
+  ],
+})
+export class UserModule {}
+----
+
+[#entity]
+== Entity Assumptions
+
+`EntityService` requires entities to have an `id` field.
+
+Your services entity might look something like:
+
+.`src/user/user.entity.ts`
+[source,typescript]
+----
+import { Column, Entity, PrimaryColumn } from "typeorm";
+
+@Entity()
+export class User {
+
+  @PrimaryColumn()
+  public id: string;
+
+  @Column({ nullable: true })
+  public name: string;
+
+  @Column()
+  public username: string;
+
+  @Column()
+  public password: string;
+
+  @Column({
+    default: false,
+  })
+  public isAdmin: boolean;
+
+}
+----
+
+[#extend]
+== Extend `EntityService`
+
+Your `UserService` will need to extend `EntityService`:
+
+.`src/user/user.service.ts`
+[source,typescript]
+----
+import { EntityService } from "@formulaic/entity-service"; // <.>
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./user.entity";
+
+@Injectable()
+export class UserService extends EntityService<User> {
+
+  public constructor(
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
+  ) {
+    super("User", users); // <.>
+  }
+
+}
+----
+<.> `EntityService` can also be imported from the `@formulaic/api` bundle
+<.> `EntityService` takes two arguments - the name of the class, which makes error messages more detailed and traceable, and the TypeORM {typeorm-repo}.
+
+== Utility Methods
+
+`EntityService` provides you with a number of utilities.
+
+To demonstrate a few, we can update the `UserService` to create a default
+administrator account if one does not already exist.
+
+We'll first setup the basic structure to lay out the flow:
+
+.`src/user/user.service.ts`
+[source,typescript]
+----
+import { EntityService } from "@formulaic/entity-service";
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { User } from "./user.entity";
+
+@Injectable()
+export class UserService extends EntityService<User> {
+
+  private readonly admin: Promise<Data<User> | DatabaseException<User>>;
+
+  public constructor(
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
+  ) {
+    super("User", users);
+    this.admin = this.ensureInitialAdmin();
+  }
+
+  /**
+   * Use to ensure there's an initial administrator account
+   * before performing operations that may require an account to exist.
+   *
+   * If the database encountered an error while locating or creating an admin account,
+   * this method will resolve `false`.
+   */
+  public async hasAdminAccount(): Promise<boolean> {
+    const admin = await this.admin;
+    return admin.hasData;
+  }
+
+}
+----
+
+=== Finding Single Entities
+
+`EntityService` wraps TypeORM's `findOne` method,
+returning responses structured using {fp} for easy transformation.
+
+.`src/user/user.service.ts`
+[source,typescript]
+----
+class UserService /* ... */ {
+  public async ensureInitialAdmin() {
+    const existing = await this.findOne({
+      where: {
+        isAdmin: true,
+      },
+    });
+  }
+}
+----
+
+This will produce one of the following responses:
+
+- `Data<User>` if a user is found
+- `EntityNotFound<"User", FindOneOptions<User>, User>` if the query was not able to find an admin
+- `DatabaseException<User, "findOne">` if TypeORM threw an unexpected error, such as if the table hasn't been created yet.
+
+=== Creating new entities
+
+The `EntityService` comes with a basic wrapper around TypeORM's `save` method.
+
+.`src/user/user.service.ts`
+[source,typescript]
+----
+class UserService /* ... */ {
+  public async createUser(
+    username: string,
+    password: string,
+    name?: string,
+    isAdmin: boolean = false,
+  ) {
+    const user = new User();
+    user.username = username;
+    user.password = password;
+    user.name = name;
+    user.isAdmin = isAdmin;
+    return this.save(user);
+  }
+}
+----
+
+This will return:
+
+- `Data<User>` if the user was created
+- `DatabaseException<User, "save">` if the save unexpectedly fails
+
+=== Create admin if missing
+
+Going back to `ensureInitialAdmin`,
+we can use {fp}'s `substituteAsync` method to create a user if one does not exist.
+
+.`src/user/user.service.ts`
+[source,typescript]
+----
+class UserService /* ... */ {
+  public async ensureInitialAdmin(
+    name: string = "Admin",
+    username: string = "admin",
+    password: string = "admin",
+  ) {
+    const existing = await this.findOne({
+      where: {
+        isAdmin: true,
+      },
+    });
+    const admin = await existing.substituteAsync(() => this.createUser(username, password, name, true));
+    return admin;
+  }
+}
+----
+
+{fp}'s `substituteAsync` will only be used if `existing` is `EntityNotFound` - it'll leave successful data (`Data<User>`) and errors (`DatabaseException`) alone.
+
+`admin` will now be one of:
+
+- `Data<User>` (either from `findOne` or `createUser`)
+- `DatabaseException<User, "findOne">`
+- `DatabaseException<User, "save">`
+
+=== Finding By ID
+
+So far all of the operations used did not depend on the structure of the entity, and would work under either `EntityService` or `BaseEntityService`.
+
+However, one of the most frequently used methods does require an `id` field - `findById`.
+
+The method wraps `findOne` under the hood, so you've already seen the return values.

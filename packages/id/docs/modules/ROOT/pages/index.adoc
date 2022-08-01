@@ -1,0 +1,13 @@
+= ID Generation Module
+
+Formulaic provides an ID generation module that easily provides collision-safe random IDs in multiple formats.
+
+== Installation
+
+Install with Yarn:
+
+[source,sh]
+----
+yarn add @formulaic/id
+----
+

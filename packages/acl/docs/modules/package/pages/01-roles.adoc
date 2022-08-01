@@ -1,0 +1,17 @@
+= Define User Roles
+
+Many features of Formulaic are setup for users to have one or more roles
+assigned to their account.
+
+To take account of these features, create an enum of all roles.
+
+.`src/role.ts`
+[source,typescript]
+----
+export enum Role {
+  ADMIN = "admin",
+  EDITOR = "editor",
+  WRITER = "writer",
+  USER = "user",
+}
+----

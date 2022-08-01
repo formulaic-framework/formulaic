@@ -1,0 +1,23 @@
+= Defining a JWT Structure
+
+The authentication module works best if you define the structure of JWTs - JWT validation will include checking that JWTs match the structure defined via class-validator.
+
+.`src/user/dto/jwt-payload.ts`
+[source,typescript]
+----
+import { Role } from "acl"; // <.>
+import { IsString } from "class-validator";
+
+export class JWTPayload {
+
+  @IsString()
+  sub: string;
+
+  @IsString({
+    each: true,
+  })
+  roles: Role[];
+
+}
+----
+<.> This example uses roles defined in a xref:acl:package:index.adoc[ACL package], created with xref:acl::index.adoc[Formulaic's ACL Utilities].

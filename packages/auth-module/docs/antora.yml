@@ -1,0 +1,6 @@
+name: auth-module
+version: 0.2.1
+title: Authentication Module
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc

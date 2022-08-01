@@ -8,10 +8,12 @@
   "scripts": {
     "build": "tsc",
     "prepack": "tsc",
-    "prepublishOnly": "tsc"
+    "prepublishOnly": "tsc",
+    "update-local": "yawn set docs/antora.yml version $(yawn get package.json version)"
   },
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "yawn-yaml-cli": "^1.0.1"
   },
   "author": {
     "name": "Flyyn"

@@ -1,0 +1,10 @@
+name: fp
+version: 0.5.3
+title: Data Types (FP)
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    functional: https://en.wikipedia.org/wiki/Functional_programming
