@@ -10,6 +10,41 @@ Formulaic contains modules and components that Flyyn has built into
 many Nest and React applications, and have been abstracted into this
 namespace to be reusable.
 
+== Highlights
+
+* Utilities return strongly-typed, safe, and chainable responses (using {fp})
+** An Either-like structure strongly types error cases
+** A Promise-like chaining structure to quickly transform data
+** Returned data can be directly sent to clients (using {fp-interceptor})
+
+[#libraries]
+== Formulaic Libraries
+
+xref:fp::index.adoc[Data Types (FP)]::
+Provides a strongly-typed and chainable structure for return values.
+Used by most Formulaic libraries.
+
+xref:entity-service::index.adoc[Entity Service]::
+Provides {typeorm} based utilities that are useful in most Nest services that interact with a TypeORM {typeorm-repo}.
+
+xref:hash::index.adoc[Hashing Module]::
+Extremely basic wrapper around {bcrypt} to use as a Nest service.
+
+xref:id::index.adoc[ID Generator Module]::
+Provides powerful shortcuts to generate random, collision resistent IDs in multiple formats.
+
+xref:fp-interceptor::index.adoc[FP Interceptor]::
+Intercepts outgoing HTTP responses in Nest, allowing routes to safely return {fp} formatted objects.
+
+xref:acl::index.adoc[Authorization (ACL) Utilities]::
+Utilities to quickly create authorization schemes using {casl}.
+
+xref:auth-module::index.adoc[Auth Module]::
+Provides both a simple authentication guard that implements the functionality of Nest's authentication tutorial,
+as well as hooks for more complex ACL schemes.  Works well with the {acl} library.
++
+Requires requests to authenticate via JWT, provided as an `Authorization` header.
+
 == Project Setup
 
 We recommend using Formulaic in a {yarn} (version 2+, "Berry") {yarn-workspaces}[monolithic repository],
