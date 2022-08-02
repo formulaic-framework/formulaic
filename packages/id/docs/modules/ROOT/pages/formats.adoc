@@ -1,0 +1,54 @@
+= Supported ID Formats
+
+== UUID
+
+UUIDv4 IDs can be generated - use the configuration "uuid".
+
+== Nanoids
+
+We use the {nanoid} library to generate shorter IDs.
+
+There are two settings for NanoIDs - the dictionary, and the length of generated ID.
+
+=== Alphanumeric Dictionary
+
+The "alphanumeric" NanoID setting produces IDs using 0-9, A-Z, a-z.
+
+Generate alphanumeric IDs by passing `["alphanumeric", size]` as a configuration.
+
+The size can be a number, representing characters generated, or a shortcut can be used:
+
+- `"hundreds"`
+- `"thousands"`
+- `"tens_of_thousands"`
+- `"millions"`
+- `"ten_million"`
+- `"billion"`
+
+These shortcuts provide a minimum number of IDs that can be
+generated before there's a 1% chance of collision.
+
+If you use `["alphanumeric", "hundreds"]`, you'll be able to
+generate several hundred IDs before reaching that 1% risk.
+
+=== Safe Dictionary
+
+The `"safe"` NanoID dictionary restricts the set of alphanumeric characters
+to produce IDs that don't have characters that look alike,
+and lacks characters that can easily produce words, to prevent any IDs that might be NSFW.
+
+The safe dictionary requires IDs to be roughly 1-2 characters longer to have about the same collision resistance as the regular alphanumeric options.
+
+As with the `"alphanumeric"` setting, you must provide the length of ID,
+either as a number or by using one of the presets:
+
+- `"hundred"`
+- `"thousand"`
+- `"thousands"`
+- `"tens_of_thousands"`
+- `"hundred_thousand"`
+- `"million"`
+- `"millions"`
+- `"fifty_million"`
+- `"hundred_million"`
+- `"billion"`

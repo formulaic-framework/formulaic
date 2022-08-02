@@ -1,0 +1,54 @@
+= Usage
+
+With `FPInterceptor` installed as a Nest interceptor, you can return {fp} objects in your controllers.
+
+[source,typescript]
+----
+import { DatabaseException, oneOfFP } from "@formulaic/fp";
+import { Controller } from "@nestjs/common";
+import { ApiExtraModels, ApiTags, ApiOkResponse } from "@nestjs/swagger";
+import { UserService } from "./user.service";
+import { UserDetails } from "./dto/user-response"; // <.>
+
+@Controller("user")
+@ApiTags("users")
+@ApiExtraModels( // <.>
+  MissingPermission,
+  NotFound,
+  UserDetails,
+  DatabaseException
+)
+export class UserController {
+
+  public constructor(
+    private readonly users: UserService, // <.>
+  ) {}
+
+  @Get(":userId")
+  @ApiOkResponse(oneOfFP([
+    NotFound,
+    UserDetails,
+    DatabaseException,
+  ]))
+  public async userDetails(
+    @Param("userId") userId: string,
+  ): Promise<NotFound<User> | DatabaseException<User> | UserDetails> {
+    const found = await this.users.findById(userId); // <.>
+    const response = await permitted.mapData(async user => {
+      return new UserDetails(user, false);
+    });
+    return response;
+  }
+
+}
+----
+<.> The custom {fp} class `UserDetails` was defined in the xref:fp::custom.adoc[FP documentation]
+<.> {nest-openapi} does not expose models defined in `oneOf` constructs, which is what `oneOfFP` uses, so OpenAPI must be explicitly told to document the models.
+<.> This example uses the `UserService` defined in documentation for Formulaic's xref:entity-service::usage.adoc[entity-service].
+<.> `findById` returns either `EntityNotFound<User>` or `Data<User>`, as defined by the entity-service - `EntityNotFound` is a sub-type of `NotFound`.
+
+[NOTE]
+====
+This controller will be revisited to add authentication checks and error responses
+with xref:auth-module::acl.adoc[Formulaic's auth-module].
+====

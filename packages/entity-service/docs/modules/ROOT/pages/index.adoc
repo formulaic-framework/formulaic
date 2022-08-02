@@ -1,0 +1,16 @@
+= Entity Service
+
+We've found that every Nest application we've written with TypeORM has a core set of database utility methods
+that almost every service uses.
+
+Formulaic ships with a base `EntityService` class to provide all of the helpers you may need.
+
+The `EntityService` returns data structured using the xref:fp::index.adoc[FP] library,
+which provides easy utilities to interact with returned data.
+
+== Installation
+
+[source,sh]
+----
+yarn add @formulaic/entity-service
+----

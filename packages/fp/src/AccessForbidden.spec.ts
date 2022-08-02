@@ -1,4 +1,5 @@
 import { AccessForbidden } from "./AccessForbidden";
+import { DatabaseException } from "./DatabaseException";
 
 describe("AccessForbidden", () => {
 
@@ -33,5 +34,22 @@ describe("AccessForbidden", () => {
     });
 
   });
+
+  describe("substituteAsync()", () => {
+
+    it("replaces the value with a resolved FP", async () => {
+      const forbidden = new AccessForbidden("user");
+      const afterSub = await forbidden.substituteAsync(async () => new DatabaseException("save"));
+      expect(afterSub.kind).toBe("UnexpectedError");
+    });
+
+    it("wraps loose values with Data", async () => {
+      const forbidden = new AccessForbidden("user");
+      const afterSub = await forbidden.substituteAsync(async () => 10);
+      expect(afterSub.kind).toBe("Data");
+      expect(afterSub.data).toBe(10);
+    });
+
+  })
 
 });

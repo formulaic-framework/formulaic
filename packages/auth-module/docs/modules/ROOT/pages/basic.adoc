@@ -1,0 +1,54 @@
+= Basic Authentication Usage
+
+The auth module includes some basic decorators for standard role-based authentication control,
+applied via a Nest guard.
+
+If you are using {casl} or another more powerful authorization flow, you may wish to skip this section
+and go directly to more advanced usage.
+
+== Guard Configuration
+
+=== Require Authentication
+
+Users can be required to have (any) valid authentication provided to access a route.
+
+Annotate with `@Private()`, or if you set `defaultPolicy: "deny"`, mark routes that do not require authentication with `@Public()`.
+
+=== Require Roles
+
+Use `@RequireRoles()` to require users to have all of the roles listed.
+
+Alternatively, use `RequireOneOfRole` to offer a list of roles that users must have one or more of to access the route.
+
+== Parameters
+
+You can use parameter decorators to fetch various details parsed from authentication.
+
+By default, all parameter decorators return `undefined` if the user wasn't authenticated -
+either annotate with `@Private()`, or provide an argument `true` to the decorator.
+
+The decorator will throw an error if it was unable to fetch the value in required mode.
+
+=== Current ID
+
+Use `@CurrentUserId()` to get the ID of the current user.
+
+[source,typescript]
+----
+@Controller("test")
+export class TestController {
+
+  @Public()
+  @Get("id")
+  public async currentUser(
+    @CurrentUserId() id: string | undefined,
+  ) {}
+
+  @Private()
+  @Get("id/safe")
+  public async requireCurrentUser(
+    @CurrentUserId(true) id: string,
+  ) {}
+
+}
+----

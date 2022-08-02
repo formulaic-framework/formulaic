@@ -1,0 +1,4 @@
+= Authentication Module
+
+The authorization module adds many utilities for authenticating/authorizing user requests in Nest,
+if requests are authenticated via JWT.

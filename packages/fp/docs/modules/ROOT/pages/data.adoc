@@ -1,0 +1,87 @@
+= Data (Either)
+
+The simplest example of `@formulaic/fp` will provide the functionality of an `Either`,
+seen in https://hackage.haskell.org/package/base-4.16.3.0/docs/Data-Either.html[Haskell],
+and JavaScript libraries such as
+https://gcanti.github.io/fp-ts/modules/Either.ts.html[`fp-ts`],
+https://folktale.origamitower.com/api/v2.3.0/en/folktale.result.html[Folktale],
+and more.
+
+`@formulaic/fp` provides `Data<T>` and `NoData<T>`.
+
+`Data` is intended to be used directly, but `NoData` is abstract
+and usually implemented by more detailed classes, like `NotFound`.
+
+[#data-interface]
+== `Data<T>` Interface
+
+[source,ts]
+----
+class Data<T> {
+  public readonly status: 200 | 201;
+  public readonly kind: "Data";
+  public readonly hasData: true;
+  public readonly noValue: false;
+  public readonly data: T;
+
+  public constructor(data: T) {}
+}
+----
+
+[#no-data-interface]
+== `NoData<T>` Interface
+
+[source,ts]
+----
+abstract class NoData<T> extends FP<T> {
+  public readonly hasData: false;
+  public readonly noValue: true;
+}
+----
+
+[#not-found-interface]
+== `NotFound<T, EntityName>` Interface
+
+[source,ts]
+----
+class NotFound<T, EntityName extends string> extends NoData<T> {
+  public readonly kind: "NotFound";
+  public readonly permissionError: boolean;
+  public readonly status: 403 | 404;
+  public readonly entityName?: EntityName;
+
+  public constructor(
+    entityName: EntityName,
+    permissionError: boolean,
+  ) {}
+}
+----
+
+== Usage
+
+Use `Data<T>` when you may or may not have a return value:
+
+[source,ts]
+----
+function getLetterInString(haystack: string, index: number): Data<string> | EntityNotFound<string, "letter"> {
+  if(haystack.length < index) {
+    return new Data(haystack[index]);
+  }
+  return new EntityNotFound("letter", false);
+}
+----
+
+You can check `hasData` to determine the result:
+
+[source,ts]
+----
+const letter = getLetterInString("Hello World", 2);
+if(letter.hasData) {
+  console.log(`Message contains '${letter.data}'`);
+} else {
+  console.log("Could not extract the second letter from the message.");
+}
+----
+
+For most cases, there's better ways to interact with `FP` data
+than directly accessing fields, which will be covered next.

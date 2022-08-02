@@ -1,0 +1,69 @@
+= Define Abilities
+
+Once you have defined the xref:02-subjects.adoc[subjects] that exist,
+you can define the actions that can be performed on each subject.
+
+== Formulaic's Actions
+
+Formulaic's ACL package comes with a basic set of actions that are suitable for many applications,
+and are used internally in some libraries.
+
+You may choose to use the built-in actions, supplement the actions, or ignore them
+and create your own enumeration of actions.
+
+=== Built-in Actions
+
+- Manage
+- Create
+- Browse
+- Update
+- Delete
+- Remove
+- Submit
+
+==== CRUD
+
+Typically applications use CRUD (create, read, update, delete) actions to represent
+most operations - we've renamed `read` to `browse` to make all actions 6 letters long.
+
+==== Hard/Soft Delete
+
+We also supply both "delete" and "remove", intended for applications that use soft-deletion.
+
+`delete` is intended to be the user's primary thought of deletion - soft-delete if the application supports it, otherwise hard deletion.
+
+`remove` is intended to always represent a hard-deletion, which may be an administrator-only action.
+
+==== Submit
+
+We find that we're often in a position where there's one additional action to add to entities,
+that's relatively obvious given what the entity represents.
+
+- An article draft needs to be published/applied to go live
+- A user-submission in a moderation queue gets approved by a moderator
+- A shopping cart gets converted into an order
+- An action that's been drafted/dry-run is approved to be executed
+
+You may wish to create a unique action for each of these.
+Alternatively, Formulaic provides `submit` as a pre-defined action, to reduce the number of one-off actions you have to define.
+
+== Defining Abilities using Built-in Actions
+
+.`src/ability.ts`
+[source,typescript]
+----
+import { Ability, AbilityClass } from "@casl/ability";
+import { Action, CRUDAction } from "@formulaic/acl";
+import {
+  AclPost,
+  AclUser,
+} from "./subjects";
+
+export type Abilities
+  = [Action.MANAGE, "all"]
+  | [Action, "AclPost" | AclPost]
+  | [CRUDAction, "AclUser" | AclUser];
+
+export type AppAbility = Ability<Abilities>;
+export const AppAbility = Ability as AbilityClass<AppAbility>;
+----

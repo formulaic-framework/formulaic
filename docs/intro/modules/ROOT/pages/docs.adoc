@@ -1,0 +1,8 @@
+= Reading the Documentation
+
+There are a lot of features and components in Formulaic, which leads to a long list of documentation sections.
+
+If you are looking for a specific feature or functionality, scan the sidebar for the topic you are interested in.
+
+Otherwise, the documentation generally ranges from lighter-weight utilities on the top, to larger modules at the bottom.
+Scanning through each section in order is a good approach to seeing what Formulaic offers.

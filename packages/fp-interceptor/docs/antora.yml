@@ -1,0 +1,6 @@
+name: fp-interceptor
+version: 0.3.3
+title: FP Interceptor
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc

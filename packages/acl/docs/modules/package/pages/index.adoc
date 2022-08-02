@@ -1,0 +1,61 @@
+= Creating an ACL Package
+
+We recommend that you create a separate Node package to store your ACL permission rules.
+This allows the greatest re-use of your ACL rules in both the server and client.
+
+The following instructions assume that you have a monolithic repository setup with Yarn Berry.
+
+Create a new directory for your package, e.g. `packages/acl/`,
+and initialize it as a Node package - with Yarn, run `yarn init` inside the new directory.
+
+Update your `package.json` to look something like this:
+
+.`package.json`
+[source,json]
+----
+{
+  "name": "acl",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}
+----
+
+Add `@casl/ability` and `@formulaic/acl`:
+
+[source,sh]
+----
+yarn add @casl/ability@^5.4.4 @formulaic/acl
+----
+
+Finally, create a `tsconfig.json` file - you may wish to just copy the file used by the Nest server.
+
+.`tsconfig.json`
+[source,json]
+----
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+----

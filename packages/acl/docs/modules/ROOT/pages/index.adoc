@@ -1,0 +1,8 @@
+= Authorization (ACL)
+
+Many components of Formulaic have been built with claim/subject-based authorization in mind.
+
+We recommend and have the best integration with the {casl} library for defining and querying permissions,
+although almost all of our components can work with other systems as well.
+
+This section will walk through setting up an authorization library using {casl} and Formulaic's ACL utilities.

@@ -1,0 +1,79 @@
+= Advanced Authorization Usage
+
+The xref:basic.adoc[decorators] from the auth module provide basic
+functionality to handle permissions, but don't do much for authorization control.
+
+Integration with an authorization library (like {casl}) provides a much better flow.
+
+The following suggestions will use {casl} for authorization, Formulaic's {fp} module to format responses, and integrate with {nest-openapi}[Nest's OpenAPI module] to document the API (and allow for automatic API client generation).
+
+However, you may choose a different set of tools that are more appropriate for your development.
+
+[NOTE]
+====
+The following controller was started in the xref:fp-interceptor::usage.adoc[documentation for Formulaic's FPInterceptor].
+====
+
+.`src/user/user.controller.ts`
+[source,typescript]
+----
+import { Ability } from "@formulaic/acl";
+import { DatabaseException, oneOfFP } from "@formulaic/fp";
+import { Acl } from "@formulaic/auth-module";
+import { AccessForbidden, MissingPermission } from "@formulaic/fp";
+import { Controller, Param } from "@nestjs/common";
+import { ApiExtraModels, ApiTags, ApiOkResponse } from "@nestjs/swagger";
+import { AppAbility, Role } from "acl"; // <.>
+import { UserService } from "./user.service";
+import { UserDetails } from "./dto/user-response";
+
+@Controller("user")
+@ApiTags("users")
+@ApiExtraModels(
+  MissingPermission,
+  NotFound,
+  UserDetails,
+  DatabaseException
+)
+export class UserController {
+
+  public constructor(
+    private readonly users: UserService,
+  ) {}
+
+  @Get(":userId")
+  @ApiOkResponse(oneOfFP([
+    MissingPermission,
+    NotFound,
+    UserDetails,
+    DatabaseException,
+  ]))
+  public async userDetails(
+    @Acl() ability: AppAbility,
+    @Param("userId") userId: string,
+  ): Promise<MissingPermission | NotFound<User> | DatabaseException<User> | UserDetails> {
+    if(ability.cannot(Action.BROWSE, "AclUser")) {
+      return new MissingPermission(); // <.>
+    }
+    const found = await this.users.findById(userId);
+    const permitted = await found.mapDataAsync(async user => {
+      const userAcl: UserAcl = {
+        kind: "UserAcl",
+        id: user.id,
+        roles: user.isAdmin ? [ Role.ADMIN ] : [],
+      };
+      if(ability.cannot(Action.BROWSE, userAcl)) {
+        return new AccessForbidden<User, "User">("User");
+      }
+      return user;
+    });
+    const response = await permitted.mapData(async user => {
+      return new UserDetails(user, false);
+    });
+    return response;
+  }
+
+}
+----
+<.> `AppAbility` is an application-specific {casl} instance defined for this project in a separate package.
+<.> If a user is globally not allowed to view _any_ entity, this example deems it safe to tell the user they lack the ability.  Once evaluating a specific user, `AccessForbidden`/`EntityNotFound` are used, which obscure per-document denied permissions.

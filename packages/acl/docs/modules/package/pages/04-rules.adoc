@@ -1,0 +1,43 @@
+= Defining Rules/Permissions
+
+{casl} has you build your permission rules in the context of a specific user
+(or lack of, for unauthenticated requests).
+
+.`src/rules.ts`
+[source,typescript]
+----
+import { AbilityBuilder } from "@casl/ability";
+import { Action } from "@formulaic/acl";
+import { AppAbility } from "./ability";
+import { Role } from "./role";
+import { AclUser } from "./subjects";
+
+export function abilityFor(user?: AclUser) {
+  const { can, cannot, build } = new AbilityBuilder(AppAbility);
+
+  const roles = user?.roles ?? [];
+  const admin = roles.includes(Role.ADMIN);
+  const editor = roles.includes(Role.EDITOR);
+  const author = roles.includes(Role.WRITER);
+  const user = roles.includes(Role.USER);
+
+  const staff = admin || editor || author;
+
+  if(admin) {
+    can(Action.MANAGE, "all");
+  } else if(editor) {
+    can(Action.BROWSE, "AclPost");
+    can([Action.UPDATE, Action.CREATE], "AclPost");
+  } else if(author) {
+    can(Action.BROWSE, "AclPost");
+    can([Action.UPDATE, Action.CREATE], "AclPost", { authorId: user.id });
+  }
+
+  can(Action.BROWSE, "AclPost", { published: true });
+
+  return build({
+    detectSubjectType: (item) => item.kind,
+  });
+}
+----
+

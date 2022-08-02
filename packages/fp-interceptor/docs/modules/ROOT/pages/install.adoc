@@ -1,0 +1,62 @@
+= Installation
+
+== NPM Packages
+
+The `FPInterceptor` is distributed on NPM individually as `@formulaic/fp-interceptor`,
+or can be installed as part of `@formulaic/api`.
+
+== Add to Nest
+
+You should add `FPInterceptor` as a global interceptor after creating a Nest server.
+
+.`src/main.ts`
+[source,typescript]
+----
+import { NestFactory } from "@nestjs/core";
+import { FPInterceptor } from "@formulaic/fp-interceptor";
+import { AppModule } from "./app.module";
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalInterceptors(new FPInterceptor());
+  await app.listen(3000);
+}
+bootstrap();
+----
+
+== Configuration
+
+The `FPInterceptor` constructor can be passed an optional object defining configuration options.
+
+=== Class Transformer Groups
+
+{fp} uses `class-transformer` groups under the hood to control data visibility -
+for instance, most debug information is only exposed if the `"debug"` group is enabled.
+
+==== Set All Groups
+
+Because {fp} internally uses a set of standard groups, FP Interceptor comes with shortcuts to enable certain groups.
+
+However, you can use the `groups` option to explicitly set the entire list of groups.
+
+==== Provide Additional Groups
+
+If you use groups in your own output, we recommend specifying which groups should be enabled
+by providing `additionalGroups` instead of overriding all groups.
+
+==== Debug and Info Output
+
+As previously mentioned, {fp} marks data with the `"debug"` group, but also makes frequent use of `"info"`.
+
+You may wish to selectively control all the information that is sent to users,
+however the two presets offer a bit of functionality out of the gate.
+
+Enabling `"debug"` will expose a large amount of information, including information that is very usually hidden from users.
+
+However, {fp} exposes a selective set of information that may provide nice insight for developers
+and users by revealing some information about the system, without explicitly opening security vulnerabilities.
+
+This includes things like the general area where an error originates (e.g. "database", or "filesystem"), and possibly the names of tables.
+
+If you are relatively relaxed about security, `"info"` can be semi-safely enabled.
+However, highly-security-conscious environments may not want to use it.

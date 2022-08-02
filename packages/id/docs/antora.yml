@@ -1,0 +1,10 @@
+name: id
+version: 0.2.1
+title: ID Generation
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    bcrypt: https://www.npmjs.com/package/bcrypt[bcrypt]
