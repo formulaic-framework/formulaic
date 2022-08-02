@@ -1,6 +1,13 @@
 releases:
+  "@formulaic/acl": patch
   "@formulaic/api": minor
+  "@formulaic/auth-module": patch
   "@formulaic/entity-service": patch
   "@formulaic/fp": minor
   "@formulaic/fp-interceptor": patch
+  "@formulaic/hash": patch
+  "@formulaic/id": patch
+  "@formulaic/react": patch
+  acl: patch
   server: patch
+  web-app: patch
