@@ -110,3 +110,24 @@ jobs:
         yarn workspace server test
         yarn workspace server test:e2e
       shell: bash
+
+  update-docs:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/main' }}
+    needs:
+      - chore
+      - acceptance
+
+    steps:
+      - name: 'Trigger documentation build'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'formulaic-framework',
+              repo: 'docs',
+              workflow_id: 'hook.yml',
+              ref: 'main',
+            });
