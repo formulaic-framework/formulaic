@@ -73,3 +73,15 @@ jobs:
         yarn config set -H 'npmAuthToken' "${{secrets.YARNBOT_NPM_TOKEN}}"
         yarn config set -H 'npmRegistries["//npm.pkg.github.com"].npmAuthToken' "${{secrets.GITHUB_TOKEN}}"
         ./scripts/release/02-release-builds.sh
+
+    - name: 'Trigger documentation build'
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.PAT }}
+        script: |
+          github.rest.actions.createWorkflowDispatch({
+            owner: 'formulaic-framework',
+            repo: 'docs',
+            workflow_id: 'hook.yml',
+            ref: 'main',
+          });
