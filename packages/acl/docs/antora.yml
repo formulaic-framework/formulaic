@@ -1,5 +1,5 @@
 name: acl
-version: 1.0.0
+version: 1.0.1
 title: Authorization (ACL) Utilities
 start_page: ROOT:index.adoc
 nav:
