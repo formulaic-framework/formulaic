@@ -1,0 +1,201 @@
+= Common FP Instances
+
+FP ships with a set of implementations of the xref:fp.adoc[`FP` interface], each useful for different use cases.
+
+These implementations are organized into a basic hierarchy to help you narrow down which implementation is most suited for your use case.
+
+.`FP` Inheritance Tree
+[subs="normal"]
+....
+**FP**
+  **Data**
+    DataFP
+    _Literal_
+  **BaseErrorFP**
+    **ErrorFP**
+      UnexpectedError
+        _DatabaseException_
+  **NoValue**
+    _Empty_
+    _MissingPermission_
+    NotFound
+      _AccessForbidden_
+      _EntityNotFound_
+....
+
+image::class-flowchart.png[]
+
+[#data]
+== Data
+
+There are two main interfaces commonly used for representing "successful data" - `DataFP` and `Literal`.
+
+[#literal]
+=== Literal
+
+`Literal` has been used extensively in the documentation so far,
+and is designed to be a very simple wrapper around values of any type.
+
+.Basic example of `Literal`
+[source,typescript]
+----
+import { Literal } from "@formulaic/fp";
+
+const input = new Literal(10); // => Literal<number>
+expect(input.data).toBe(10);
+----
+
+`Literal` allows you to create an `FP` object without defining any classes or potential for conflicting fields,
+however it means all data is a layer below inside the `data` property.
+
+[#data-fp]
+=== DataFP
+
+`DataFP` is an abstract class that is ready for you to define your own `FP` object,
+representing a successful state.
+
+The xref:custom.adoc[next section will walk through] extending `DataFP` in depth.
+
+By extending `DataFP`, details are available at the top level, and can also be included in OpenAPI documents.
+
+.Example usage of custom class extending `DataFP`
+[source,typescript]
+----
+const response = new LoginResponse("admin", "[jwt contents]"); // <.>
+expect(response.id).toBe("admin");
+----
+<.> `LoginResponse` extends `DataFP`, and is defined in the xref:custom.adoc[next section].
+
+[#error]
+== Errors
+
+FP contains a few ways to represent "errors"footnote:[FP does not assign any specific definition or severity when using the term "error", leaving it to the user.]
+or other failures.
+
+[#error-unexpected]
+=== UnexpectedError
+
+We mention `UnexpectedError` first, which may be the only error implementation you wish to use
+if you are concerned about revealing information in the case of failures.
+
+.Interface of `UnexpectedError`
+[source,typescript]
+----
+class UnexpectedError<T, Err = any> extends ErrorFP<T> {
+  kind: "UnexpectedError";
+  status: 500;
+  code?: string;
+  error?: Err;
+  serializedError?: string;
+}
+----
+
+If you use {fp-interceptor}, `UnexpectedError` defaults to only returning
+`kind` and `status` in production environments,
+while also including `code` and `error` in development.
+
+This allows you to safely create instances and sub-classes of `UnexpectedError`
+without any risk of revealing error causes or information in production,
+which may reveal sensitive information.
+
+[#error-fp]
+=== ErrorFP
+
+If you wish to create your own errors (that aren't set to hide all properties by default),
+`ErrorFP` is made to be extended.
+
+[TIP]
+====
+`ErrorFP` extends `Error` with only one change - `ErrorFP` sets `noValue` to `true`, which prevents substitutions from running.
+
+This is very often the desired behavior, however in some cases may have something that "failed" yet still should be treated as a missing value.
+
+For these cases you can extend `Error` instead of `ErrorFP`, and the same instructions will hold.
+====
+
+[#no-value]
+== No Value
+
+FP defines an explicit "empty" or "missing value" type, which both avoids the dangers of "null"
+and enables chaining and other utility functions.
+
+FP provides three ways to create "no value" responses.
+
+[#no-value-empty]
+=== Empty
+
+Earlier sections have already used the `Empty` class as a counterpart to `Literal`
+xref:data.adoc[in order to create Either-like functionality].
+
+`Empty` is often used as-is to create a `null`-like "valueless-value",
+or can be extended.
+
+[#no-value-built-in]
+=== Other built-in implementations
+
+Along with the minimal `Empty` class, FP also includes built-in implementations
+like `MissingPermission`.
+
+[#no-value-custom]
+=== Custom Implementation of NoValue
+
+`NoValue` can be directly extended for your own purposes.
+
+[#no-value-not-found]
+=== NotFound
+
+Frequently applications need to handle requests for entities that users do not have
+permission to view.
+
+While a permission denied request could be sent as a 401 Unauthorized response,
+it is often good practice to respond with a 404 Not Found response,
+completely obscuring all information about the entity including it's existence.
+
+However, during development and debugging, there normally is no reason why developers
+should be restricted from seeing the root cause of an error.
+
+FP provides a built-in type to handle this specific case due to how often it comes up,
+even in other FP modules like our xref:entity-service::index.adoc[database utilities].
+
+**NotFound** is a base class like <<error-unexpected>>, where all information is stripped
+by default in production.
+
+`NotFound` can be used directly, taking a description of the entity, and a flag `permissionError`
+which is set to `true` if an entity exists but the user can't access it,
+and set to `false` if the entity does not exist.
+
+[source,typescript]
+----
+const notFound = new NotFound("User", false);
+const notPermitted = new NotFound<User, User>("User", true);
+----
+
+A shortcut, `AccessForbidden` exists for permission errors:
+
+[source,typescript]
+----
+const forbidden = new AccessForbidden<User, User>("User");
+----
+
+And implementations like `EntityNotFound` exist for failed operations,
+and may include additional information (like the failed query):
+
+[source,typescript]
+----
+import { Literal, EntityNotFound } from "@formulaic/fp";
+import { Repository, FindOneOptions } from "typeorm";
+
+async function findById(
+  repo: Repository<User>,
+  id: string,
+): Promise<Literal<User> | EntityNotFound<User, User, "User", FindOneOptions>> {
+  const query: FindOneOptions = {
+    where: { id },
+  };
+  const found = await repo.findOne(query);
+  if(!found) {
+    return new EntityNotFound("User", query);
+  }
+  return new Literal(found);
+}
+----

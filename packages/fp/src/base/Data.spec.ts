@@ -1,63 +1,82 @@
-import { AccessForbidden } from "../AccessForbidden";
-import { Data } from "./Data";
+import { Literal } from "../Literal";
+import { DataFP } from "./DataFP";
+import { LoginResponse } from "./DataFP.spec";
 
 describe("Data", () => {
 
-  it("stores a value", () => {
-    const data = new Data("Hello");
-    expect(data.data).toBe("Hello");
+  describe.each([
+    ["Literal", new Literal(10)],
+    ["DataFP (LoginResponse)", new LoginResponse("admin", "[jwt contents]")],
+  ])("DataFP instance: %s", (name, fp) => {
+    const altValue = "alt";
+
+    describe("alt", () => {
+      const alt = fp.alt(() => altValue);
+
+      it("returns the FP instance", () => {
+        expect(alt).toBe(fp);
+      });
+
+      it("does not return the alternative value", () => {
+        expect(alt).not.toBe(altValue);
+      });
+    });
+
+    describe("altThen", () => {
+      it("returns the FP instance", async () => {
+        const altThen = await fp.altThen(() => Promise.resolve(altValue));
+        expect(altThen).toBe(fp);
+      });
+    });
+
+    describe("altValue", () => {
+      const alt = fp.altValue(altValue);
+      it("returns the FP instance", () => {
+        expect(alt).toBe(fp);
+      });
+    });
+
+    describe("or", () => {
+      it("returns the FP instance", () => {
+        expect(fp.or(() => altValue)).toBe(fp);
+      });
+    });
+
+    describe("orThen", () => {
+      it("returns the FP instance", async () => {
+        expect(await fp.orThen(() => Promise.resolve(altValue))).toBe(fp);
+      });
+    });
+
+    describe("orValue", () => {
+      it("returns the FP instance", async () => {
+        expect(fp.orValue(altValue)).toBe(fp);
+      });
+    });
   });
 
-  describe("mapData()", () => {
+  describe("getData()", () => {
 
-    it("can do simple transformations", () => {
-      const num = new Data(10);
-      const transformed = num.mapData(n => n + 1);
-      expect(transformed.data).toBe(11);
-    });
+    it("is implemented for both Literal and DataFP", () => {
 
-    it("can unpack returned Data", () => {
-      const num = new Data(10);
-      const transformed = num.mapData(n => new Data(n + 1));
-      expect(transformed.data).toBe(11);
-    });
+      class ExampleData extends DataFP {
+        public override readonly kind: "ExampleData";
+        public override readonly status: 200;
 
-    it("will pass through errors", () => {
-      const num = new Data(10);
-      const convertedError = num.mapData(() => new AccessForbidden("User"));
-      expect(convertedError.kind).toBe("NotFound");
-    });
+        public constructor() {
+          super();
+          this.kind = "ExampleData";
+          this.status = 200;
+        }
+      }
 
-  });
+      const literal = new Literal(10);
+      const dataFP = new ExampleData();
 
-  describe("or()", () => {
-
-    it("returns the existing data", () => {
-      const num = new Data(10);
-      const afterOr = num.or(-1);
-      expect(afterOr.data).toBe(10);
-    });
-
-  });
-
-  describe("substitute()", () => {
-
-    it("returns the existing data", () => {
-      const num = new Data(10);
-      const afterSub = num.substitute(-1);
-      expect(afterSub.data).toBe(10);
-    });
-
-  });
-
-  describe("substituteAsync()", () => {
-
-    it("returns the existing data", async () => {
-      const num = new Data(10);
-      const afterSub = await num.substituteAsync(async () => -1);
-      expect(afterSub.data).toBe(10);
+      expect(literal.getData()).toBe(10);
+      expect(dataFP.getData().status).toBe(200);
     });
 
   })
 
-});
+})

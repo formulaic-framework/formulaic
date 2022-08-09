@@ -1,11 +1,34 @@
+// Base 'FP' type
+
+export { FP } from "./base/FP";
+
+// Core FP interfaces
 export { Data } from "./base/Data";
-export { FP, isFP } from "./base/FP";
-export { NoData } from "./base/NoData";
-export { NonData } from "./base/NonData";
-export { FPConstructor, oneOfFP } from "./util/oneOfFP";
-export { AccessForbidden } from "./AccessForbidden";
+export { DataFP } from "./base/DataFP";
+export { BaseErrorFP, ErrorFP } from "./base/ErrorFP";
+export { NoValue } from "./base/NoValue";
+
+// Not Found types
+export { AccessForbidden } from "./not-found/AccessForbidden";
+export { EntityNotFound } from "./not-found/EntityNotFound";
+export { NotFound } from "./not-found/NotFound";
+
+// Common FP types
+export { Empty } from "./Empty";
+export { Literal } from "./Literal";
+
+// Common FP errors
 export { DatabaseException } from "./DatabaseException";
-export { EntityNotFound } from "./EntityNotFound";
 export { MissingPermission } from "./MissingPermission";
-export { NotFound } from "./NotFound";
 export { UnexpectedError } from "./UnexpectedError";
+
+// Utilities
+export { isFP } from "./base/FP";
+export {
+  Alt,
+  EnsureFP,
+  FPFields,
+  MapFP,
+  Or,
+} from "./base/util";
+export { FPConstructor, oneOfFP } from "./util/oneOfFP";

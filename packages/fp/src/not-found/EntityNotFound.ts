@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
+import { MapFP } from "../base/util";
 import { NotFound } from "./NotFound";
 
 /**
@@ -10,10 +11,11 @@ import { NotFound } from "./NotFound";
  * missing entities and permission errors, exposing both as a minimal {@link NotFound} response.
  */
 export class EntityNotFound<
+  T,
+  EntityType = T,
   EntityName extends string = string,
   FindOptions = any,
-  T = any,
-> extends NotFound<T, EntityName> {
+> extends NotFound<T, EntityType, EntityName> {
 
   @ApiPropertyOptional()
   @Expose({
@@ -27,6 +29,14 @@ export class EntityNotFound<
   ) {
     super(entityName, false);
     this.findOptions = findOptions;
+  }
+
+  public override map<O>(fn: (data: T) => O): MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>> {
+    return this as unknown as MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>>;
+  }
+
+  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>>> {
+    return this as unknown as MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>>;
   }
 
 }

@@ -1,51 +1,86 @@
 = Creating Custom Data Classes
 
-xref:index.adoc[FP] can be extended to represent your own data.
+You can xref:common.adoc#literal[use FP's `Literal` class] for successful data,
+but has many limitations.
 
-For general data, you should extend `NonData` - the name is misleading,
-but represents successful data that does not extend the `Data` class.
+To go beyond the default `Literal` class, you can define a custom class that extends
+`DataFP` (an abstract class from FP).
 
-.`src/user/dto/user-details.ts`
+.Example class created by extending `DataFP`
 [source,typescript]
 ----
-import { NonData } from "@formulaic/fp";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { Equals, IsString } from "class-validator";
-import { User } from "../user.entity"; // <.>
+import { Equals, IsIn, IsJWT, IsString } from "class-validator";
+import { DataFP } from "./DataFP";
 
-export class UserDetails<T = any> extends NonData<T> {
-  public static readonly kind = "UserDetails";
+export class LoginResponse extends DataFP {
+  public static readonly kind = "LoginResponse"; // <1>
+
+  @ApiProperty() // <2>
+  @Equals("LoginResponse")
+  @Expose()
+  public override readonly kind: "LoginResponse"; // <3>
 
   @ApiProperty()
-  @Equals("UserDetails")
+  @IsIn([200, 201])
   @Expose()
-  public override readonly kind: "UserDetails";
-
-  @ApiProperty()
-  @Expose()
-  public override readonly status: 200 | 201;
+  public override readonly status: 200 | 201; // <3>
 
   @ApiProperty()
   @IsString()
   @Expose()
-  public readonly id: string;
+  public readonly id: string; // <4>
 
-  @ApiPropertyOptional()
-  @IsString()
+  @ApiProperty()
+  @IsJWT()
   @Expose()
-  public readonly name: string;
+  public readonly jwt: string; // <4>
 
-  public constructor(user: User, created = false) {
+  public constructor(
+    id: string,
+    jwt: string,
+    newRegistration: boolean = false,
+  ) {
     super();
-    this.kind = "UserDetails";
-    this.status = created ? 201 : 200;
-    this.id = user.id;
-    this.name = user.name;
+    this.kind = "LoginResponse";
+    this.status = newRegistration ? 201 : 200;
+    this.id = id;
+    this.jwt = jwt;
   }
-
 }
 ----
-<.> The `User` TypeORM entity was created in xref:entity-service::usage.adoc#entity[Formulaic's entity-service documentation]
+<1> Defining a static `kind` property is used in some utilities, but is not required.
+<2> `DataFP` does not attach `ApiProperty`, `Expose`, or any validation decorators (unlike other `FP` classes) - if using OpenAPI or {fp-interceptor} you should declare `ApiProperty` and `Expose`.
+<3> You must define `kind` and `status` fields.
+<4> You may define any additional fields to represent your data, such as `id` and `jwt`.
 
-You likely will want to add additional properties to the object, and add constructor parameters to set them.
+Now the properties are exposed directly in the returned object,
+no need to go through `data`:
+
+.Example usage of custom class extending `DataFP`
+[source,typescript]
+----
+const response = new LoginResponse("admin", "[jwt contents]");
+expect(response.id).toBe("admin");
+----
+
+If an error might be returned, you can check that the value is a `LoginResponse` before
+accessing fields, or use a transformation like `map` or `chain`.
+
+[source,typescript]
+----
+async function performLogin(
+  username: string,
+  password: string,
+): Promise<LoginResponse | UnexpectedError<LoginResponse>> {
+  return response;
+}
+
+const login = await performLogin("admin", "top-secret-password");
+if(login.hasData) {
+  console.log(`Success!  JWT: ${login.jwt}`);
+} else {
+  console.log("Failed login.");
+}
+----

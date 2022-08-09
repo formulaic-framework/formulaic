@@ -13,3 +13,5 @@
 /example/*/dist/
 /packages/*/dist/
 /packages/*/coverage/
+
+out/

@@ -1,4 +1,4 @@
-import { Data, DatabaseException, EntityNotFound } from "@formulaic/fp";
+import { DatabaseException, EntityNotFound, Literal } from "@formulaic/fp";
 import {
   FindOneOptions,
   FindManyOptions,
@@ -48,27 +48,27 @@ export class BaseEntityService<
    * Get every entity in the database.
    * Returns a {@link DatabaseException} if any errors are thrown.
    */
-   public async listAll(): Promise<Data<T[]> | DatabaseException<T[], "find">>;
+   public async listAll(): Promise<Literal<T[]> | DatabaseException<T[], "find">>;
    /**
     * Get every entity in the database, throwing a {@link DatabaseException} if any errors are thrown.
     */
    public async listAll(required: true): Promise<T[]>;
-   public async listAll(required?: true): Promise<T[] | Data<T[]> | DatabaseException<T[], "find">> {
+   public async listAll(required?: true): Promise<T[] | Literal<T[]> | DatabaseException<T[], "find">> {
      return this.find({}, required);
    }
 
    public async find(options: FindManyOptions<T>, required: true): Promise<T[]>;
-   public async find(options: FindManyOptions<T>): Promise<Data<T[]> | DatabaseException<T[], "find">>;
+   public async find(options: FindManyOptions<T>): Promise<Literal<T[]> | DatabaseException<T[], "find">>;
    public async find(
      options: FindManyOptions<T>,
      required?: true,
-   ): Promise<T[] | Data<T[]> | DatabaseException<T[], "find">> {
+   ): Promise<T[] | Literal<T[]> | DatabaseException<T[], "find">> {
      try {
        const data = await this.repo.find(options);
        if(required) {
          return data;
        }
-       return new Data(data);
+       return new Literal(data);
      } catch (e) {
        if(required) {
          throw new DatabaseException("find", e);
@@ -78,19 +78,19 @@ export class BaseEntityService<
    }
 
   public async findOne(options: FindOneOptions<T>, required: true): Promise<T>;
-  public async findOne(options: FindOneOptions<T>): Promise<Data<T> | EntityNotFound<EntityName, FindOneOptions<T>> | DatabaseException<T, "findOne">>;
+  public async findOne(options: FindOneOptions<T>): Promise<Literal<T> | EntityNotFound<T, T, EntityName, FindOneOptions<T>> | DatabaseException<T, "findOne">>;
   public async findOne(
     options: FindOneOptions<T>,
     required?: true,
-  ): Promise<T | Data<T> | EntityNotFound<EntityName, FindOneOptions<T>, T> | DatabaseException<T, "findOne">> {
+  ): Promise<T | Literal<T> | EntityNotFound<T, T, EntityName, FindOneOptions<T>> | DatabaseException<T, "findOne">> {
     try {
       const data = await this.repo.findOne(options);
       if(data) {
-        return required ? data : new Data(data);
+        return required ? data : new Literal(data);
       } else if(required) {
         throw new EntityNotFound(this.entityName, options);
       }
-      return new EntityNotFound<EntityName, FindOneOptions<T>, T>(this.entityName, options);
+      return new EntityNotFound<T, T, EntityName, FindOneOptions<T>>(this.entityName, options);
     } catch (e) {
       if(required) {
         throw new DatabaseException("findOne", e);
@@ -99,10 +99,10 @@ export class BaseEntityService<
     }
   }
 
-  protected async save(unsaved: T): Promise<Data<T> | DatabaseException<T, "save">> {
+  protected async save(unsaved: T): Promise<Literal<T> | DatabaseException<T, "save">> {
     try {
       const saved = await this.repo.save(unsaved);
-      return new Data(saved);
+      return new Literal(saved);
     } catch (e) {
       return new DatabaseException("save", e);
     }

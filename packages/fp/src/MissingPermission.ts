@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { FP } from "./base/FP";
+import { ErrorFP } from "./base/ErrorFP";
+import { MapFP } from "./base/util";
 
 /**
  * Report that a user is completely missing the permission for a broad action.
@@ -8,7 +9,7 @@ import { FP } from "./base/FP";
  * use {@link AccessForbidden} if evaluating the user's ability relative to a specific document, which can avoid
  * revealing the existence of hidden information.
  */
-export class MissingPermission<T> extends FP<T> {
+export class MissingPermission<T> extends ErrorFP<T> {
   public static readonly kind = "MissingPermission";
 
   @ApiProperty()
@@ -17,15 +18,17 @@ export class MissingPermission<T> extends FP<T> {
   @ApiProperty()
   public override readonly status: 401;
 
-  public override readonly hasData: false;
-
-  public override readonly noValue: false;
-
   public constructor() {
     super();
     this.kind = "MissingPermission";
     this.status = 401;
-    this.hasData = false;
-    this.noValue = false;
+  }
+
+  public override map<O>(fn: (value: T) => O): MapFP<this, O, MissingPermission<O>> {
+    return this as unknown as MapFP<this, O, MissingPermission<O>>;
+  }
+
+  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<MapFP<this, O, MissingPermission<O>>> {
+    return this as unknown as MapFP<this, O, MissingPermission<O>>;
   }
 }

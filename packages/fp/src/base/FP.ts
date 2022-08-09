@@ -1,5 +1,8 @@
+import { Transformer } from "../transformers";
 import { Data } from "./Data";
-import type { NoData } from "./NoData";
+import type { Alt, FPFields, MapFP, Or } from "./util";
+
+const inspect = Symbol.for("nodejs.util.inspect.custom");
 
 export type EnsureData<O> = O extends { kind: string } ? O : Data<O>;
 
@@ -9,100 +12,160 @@ export type MapFPUnless<ThisType extends FP<any>, K extends string, O> = ThisTyp
 
 export type MapFPData<T, ThisType extends FP<T>, O> = ThisType extends Data<T> ? EnsureData<O> : ThisType;
 
+/**
+ * A base class for data that allows for strong-typing, even in error cases, and is chainable for easy use.
+ *
+ * Additionally, instances can be ready to transmit over the network, using `class-transformer` to hide information
+ * that shouldn't be revealed.
+ */
 export abstract class FP<T> {
-  public abstract readonly status: number;
+
+  /**
+   * The primary discriminator to differentiate between classes that extend {@link FP}.
+   *
+   * Multiple classes may use the same `kind`, but they must have some other way to discriminate between them.
+   */
   public abstract readonly kind: string;
+
+  /**
+   * Usually represents a general HTTP response code that would be accurate for this entity.
+   *
+   * May be used by interceptors/further formatters to format HTTP responses.
+   */
+  public abstract readonly status: number;
+
+  /**
+   * Provides a general sense if a response has "successful" data.
+   * Allows data chaining.
+   */
   public abstract readonly hasData: boolean;
+
+  /**
+   * Provides a general sense if a response represents an error or some
+   * other failing.
+   *
+   * Allows error chaining.
+   */
+  public abstract readonly hasError: boolean;
+
+  /**
+   * Used for specific cases where no error has occurred, yet data is not available.
+   * Aims to prevent `null` hell.
+   */
   public abstract readonly noValue: boolean;
 
   /**
-   * Utility to easily transform data based on type - especially useful for conditionally converting types.
+   * Provide a fallback that is used if this response represents a lack of a value.
+   *
+   * The fallback does not replace any error cases (unless both `hasError` and `noValue` are set).
+   *
+   * Returned values that are not instances of {@link FP} will be wrapped in {@link Literal}.
+   *
+   * @param fn A function that produces a fallback value
    *
    * @example
-   * function getData(): Data<number> | AccessForbidden<"Number"> {
-   *   return new Data(10);
+   * function sampleFunction(): Literal<number> | NoValue<number> | ErrorFP<number> {
+   *   return new Literal(10);
    * }
-   * const x = getData();
-   * const y = x.mapIf(AccessForbidden, () => new DatabaseException("find"));
+   * const found = sampleFunction();
+   * const afterFallback = found.alt(() => new Literal(15));
+   * // => Literal<number> | ErrorFP<number>
    */
-  public mapIf<K extends string, O>(
-    kind: K | { kind: K },
-    fn: (input: this) => O,
-  ): MapFPIf<this, K, O> {
-    const k = typeof kind === "string" ? kind : kind.kind;
-    if(this.kind === k) {
-      const mapped = fn(this);
-      if(isFP(mapped)) {
-        return mapped as MapFPIf<this, K, O>;
-      }
-      return new Data(mapped) as MapFPIf<this, K, O>;
-    }
-    return this as MapFPIf<this, K, O>;
-  }
-
-  public mapUnless<K extends string, O>(
-    kind: K | { kind: K } | K[],
-    fn: (input: this) => O,
-  ): MapFPUnless<this, K, O> {
-    const k = typeof kind === "string"
-      ? [kind]
-      : Array.isArray(kind)
-        ? kind
-        : [kind.kind];
-    if(k.includes(this.kind as K)) {
-      return this as MapFPUnless<this, K, O>;
-    }
-    const mapped = fn(this);
-    if(isFP(mapped)) {
-      return mapped as MapFPUnless<this, K, O>;
-    }
-    return new Data(mapped) as MapFPUnless<this, K, O>;
-  }
+  public abstract alt<O>(fn: () => O): Alt<this, O>;
 
   /**
-   * Perform a data-transformation if data is available ({@link hasData}),
-   * retaining the original data if data is not available.
-   */
-  public mapData<O>(fn: (input: T) => O): MapFPData<T, this, O> {
-    return this as MapFPData<T, this, O>;
-  }
-
-  /**
-   * Promise-version of {@link mapData}
-   */
-  public mapDataAsync<O>(fn: (input: T) => Promise<O>): Promise<MapFPData<T, this, O>> {
-    return Promise.resolve(this) as Promise<MapFPData<T, this, O>>;
-  }
-
-  /**
-   * Replace any non-successful result with a default value.
+   * Asynchronously provide a fallback that is used if this response represents a lack of a value.
    *
-   * To only replace missing values (e.g. "value not found"), use {@link substitute()} instead.
+   * The fallback does not replace any error cases (unless both `hasError` and `noValue` are set).
+   *
+   * Resolved values that are not instances of {@link FP} will be wrapped in {@link Literal}.
+   *
+   * @param fn An async function that produces a fallback value
    */
-  public or<O = T>(value: O): (this extends Data<T> ? this : Data<O>) {
-    return new Data(value) as (this extends Data<T> ? this : Data<O>);
-  }
+  public abstract altThen<O>(value: () => Promise<O>): Promise<Alt<this, O>>;
 
   /**
-   * Provide a backup value that should be used if an operation specifically reported
-   * that a value was missing.
+   * Provide a fallback value that is used if this response represents a lack of a value.
    *
-   * This does not change the value if an error was thrown - use {@link or()} instead to replace
-   * any non-successful result.
+   * The fallback does not replace any error cases (unless both `hasError` and `noValue` are set).
+   *
+   * Fallback values that are not instances of {@link FP} will be wrapped in {@link Literal}.
+   *
+   * @param value A fallback value.
+   *
+   * @example
+   * function sampleFunction(): Literal<number> | NoValue<number> | ErrorFP<number> {
+   *   return new Literal(10);
+   * }
+   * const found = sampleFunction();
+   * const afterFallback = found.alt(new Literal(15));
+   * // => Literal<number> | ErrorFP<number>
    */
-  public substitute(value: T): (this extends NoData<T> ? Data<T> : this) {
-    return this as (this extends NoData<T> ? Data<T> : this);
-  }
+  public abstract altValue<O>(value: O): Alt<this, O>;
 
   /**
-   * Provide an asynchronous way of obtaining a backup value that should be used if an operation
-   * specifically reported that a value was missing.
+   * Replace any non-"success data" (if `hasData == false`) value with the value returned from the provided function.
    *
-   * This does not change the result if an error was thrown - use {@link or()} instead to replace
-   * any non-successful result.
+   * If the function returns a value that is not an instance of {@link FP}, it will be wrapped in {@link Literal}.
+   *
+   * @param fn A function that produces a fallback value.
    */
-  public substituteAsync<O>(fn: () => Promise<O>): Promise<this extends NoData<T> ? EnsureData<O> : this> {
-    return Promise.resolve(this) as Promise<this extends NoData<T> ? EnsureData<O> : this>;
+  public abstract or<O>(fn: () => O): Or<this, O>;
+
+  /**
+   * Asynchronously replaces any non-"success data" (if `hasData == false`) value with the value resolved in the provided function.
+   *
+   * If the function resolves a value that is not an instance of {@link FP}, it will be wrapped in {@link Literal}.
+   *
+   * @param fn A function that resolves to a fallback value.
+   */
+  public abstract orThen<O>(fn: () => Promise<O>): Promise<Or<this, O>>;
+
+  /**
+   * Replaces any non-"success data" (if `hasData == false`) value with the value provided.
+   *
+   * If the value provided is not an instance of {@link FP}, it will be wrapped in {@link Literal}.
+   *
+   * @param value A fallback value.
+   */
+  public abstract orValue<O>(value: O): Or<this, O>;
+
+  /**
+   * Transform "success data" (if `hasData == true`), while leaving empty values or errors alone.
+   *
+   * If the value returned is not an instance of {@link FP}, it will be wrapped in {@link Literal}.
+   *
+   * @param fn A function that transforms the current value.
+   */
+  public abstract map<O>(fn: (data: T) => O): MapFP<this, O, FPFields<this>>;
+
+  /**
+   * Asynchronously transform "success data" (if `hasData == true`), while leaving empty values or errors alone.
+   *
+   * @param fn A function that transforms the current value.
+   */
+  public abstract chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, FPFields<this>>>;
+
+  public get [Symbol.toStringTag](): string {
+    return this.kind;
+  }
+
+  public [inspect](depth: number | null, options, inspect) {
+    if(depth < 0) {
+      return options.stylize(`[${this.inspectTag(depth, options, inspect)}]`, 'special');
+    }
+
+    return `${this.inspectTag(depth, options, inspect)} ${this.inspectValue(depth, options, inspect)}`;
+  }
+
+  /* istanbul ignore next */
+  protected inspectTag(depth: number | null, options, inspect): string {
+    return this[Symbol.toStringTag];
+  }
+
+  /* istanbul ignore next */
+  protected inspectValue(depth: number | null, options, inspect): string {
+    return "";
   }
 
 }
