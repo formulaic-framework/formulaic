@@ -1,4 +1,5 @@
 * xref:index.adoc[Overview]
+* xref:fp.adoc[FP Interface]
 * xref:data.adoc[]
-* xref:methods.adoc[]
+* xref:common.adoc[]
 * xref:custom.adoc[]

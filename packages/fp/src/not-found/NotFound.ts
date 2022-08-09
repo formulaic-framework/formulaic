@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose, Transform } from "class-transformer";
-import { NoData } from "./base/NoData";
+import { NoValue } from "../base/NoValue";
 
 /**
  * Flexible class describing an entity that was not found,
  * or that the user lacks permission to view.
  */
-export class NotFound<T, EntityName extends string> extends NoData<T> {
+export class NotFound<T, EntityType, EntityName extends string> extends NoValue<T> {
   public static readonly kind = "NotFound";
 
   @ApiProperty()
@@ -26,17 +26,14 @@ export class NotFound<T, EntityName extends string> extends NoData<T> {
   /**
    * Flexible HTTP status - by default, debug mode will reveal the distinction between not found errors
    * and permission errors, and production environments will hide the difference.
-   *
-   * If a value is set, it will override the default logic.
    */
   @ApiProperty()
-  @Transform(({ value, obj, options }) => {
-    if(value) {
+  @Transform(({ value, options }) => {
+    const groups = (options && options.groups && Array.isArray(options.groups))
+      ? options.groups
+      : [];
+    if(groups.includes("debug") || groups.includes("exposeForbidden")) {
       return value;
-    }
-    if(options.groups.includes("debug") || options.groups.includes("exposeForbidden")) {
-      const permissionError = (obj as NotFound<any, any>).permissionError;
-      return permissionError ? 403 : 404;
     }
     return 404;
   })
@@ -54,6 +51,7 @@ export class NotFound<T, EntityName extends string> extends NoData<T> {
   ) {
     super();
     this.kind = "NotFound";
+    this.status = permissionError ? 403 : 404;
     this.permissionError = permissionError;
     this.entityName = entityName;
   }

@@ -1,87 +1,169 @@
 = Data (Either)
 
-The simplest example of `@formulaic/fp` will provide the functionality of an `Either`,
+The previous examples of chaining used two implementations of `FP`: `Literal` and `Empty`.
+
+These two classes provide an implementation of `Either`,
 seen in https://hackage.haskell.org/package/base-4.16.3.0/docs/Data-Either.html[Haskell],
 and JavaScript libraries such as
 https://gcanti.github.io/fp-ts/modules/Either.ts.html[`fp-ts`],
 https://folktale.origamitower.com/api/v2.3.0/en/folktale.result.html[Folktale],
 and more.
 
-`@formulaic/fp` provides `Data<T>` and `NoData<T>`.
+Implementations of `Either` provide a clear and unmistakable difference between the presence and absence of data -
+avoiding https://www.lucidchart.com/techblog/2015/08/31/the-worst-mistake-of-computer-science/[null], `undefined`,
+and other troublesome ways of representing a lack of data.
 
-`Data` is intended to be used directly, but `NoData` is abstract
-and usually implemented by more detailed classes, like `NotFound`.
+[#properties]
+== Properties
 
-[#data-interface]
-== `Data<T>` Interface
+Before getting too far, it may be best to look at the actual properties of `Literal` and `Empty` -
+the type system will save you from the properties on the backend,
+but it may be helpful to see how FP works, and how the objects look after the compiler strips
+out type information.
 
-[source,ts]
+[NOTE]
+====
+The following definitions include properties defined in inherited classes to provide
+more information that exist in the actual class definitions of `Literal` and `Empty`.
+====
+
+.Properties of `Literal`
+[source,typescript]
 ----
-class Data<T> {
-  public readonly status: 200 | 201;
-  public readonly kind: "Data";
-  public readonly hasData: true;
-  public readonly noValue: false;
-  public readonly data: T;
+class Literal<T> extends Data<T> {
+  kind: "Literal";
 
-  public constructor(data: T) {}
+  status: 200 | 201;
+
+  hasData: true;
+  hasError: false;
+  noValue: false;
+
+  data: T;
 }
 ----
 
-[#no-data-interface]
-== `NoData<T>` Interface
-
-[source,ts]
+.Properties of `Empty`
+[source,typescript]
 ----
-abstract class NoData<T> extends FP<T> {
-  public readonly hasData: false;
-  public readonly noValue: true;
+class Empty<T = any> extends NoValue<T> {
+  kind: "Empty";
+
+  status: 404;
+
+  hasData: false;
+  hasError: false;
+  noValue: true;
 }
 ----
 
-[#not-found-interface]
-== `NotFound<T, EntityName>` Interface
+[#usage]
+== Using Literal/Empty Values
 
-[source,ts]
+There are (at least) five different ways to evaluate and process values that are returned
+as `Literal` or `Either` instances, with reasons why each may be good for certain situations.
+
+We will be using the same data for all of the following examples,
+which is a basic example of loading a configuration value.
+
+.Example `Literal`/`Empty` for use in following examples
+[source,typescript]
 ----
-class NotFound<T, EntityName extends string> extends NoData<T> {
-  public readonly kind: "NotFound";
-  public readonly permissionError: boolean;
-  public readonly status: 403 | 404;
-  public readonly entityName?: EntityName;
-
-  public constructor(
-    entityName: EntityName,
-    permissionError: boolean,
-  ) {}
-}
-----
-
-== Usage
-
-Use `Data<T>` when you may or may not have a return value:
-
-[source,ts]
-----
-function getLetterInString(haystack: string, index: number): Data<string> | EntityNotFound<string, "letter"> {
-  if(haystack.length < index) {
-    return new Data(haystack[index]);
+import { readFileSync } from "fs";
+function loadPortConfig(filename: string = "port.txt"): Literal<number> | Empty<number> {
+  try {
+    const fileContent = readFileSync(filename, "utf8");
+    const num = parseInt(fileContent, 10);
+    if(num && !isNaN(num)) {
+      return new Literal(num);
+    }
+    return new Empty();
+  } catch (e) {
+    return new Empty();
   }
-  return new EntityNotFound("letter", false);
 }
+
+const portConfig = loadPortConfig();
 ----
 
-You can check `hasData` to determine the result:
+[#usage-kind]
+=== Checking 'kind'
 
-[source,ts]
+Every `FP` object is required to include a `kind` field,
+which can determine if the returned config is a `Literal`.
+
+.Example using `kind`
+[source,typescript]
 ----
-const letter = getLetterInString("Hello World", 2);
-if(letter.hasData) {
-  console.log(`Message contains '${letter.data}'`);
+var port: number;
+if(portConfig.kind === "Literal") {
+  console.log(`Listening on port ${portConfig.data}, as-per config.`);
+  port = portConfig.data;
 } else {
-  console.log("Could not extract the second letter from the message.");
+  console.log("No configured port.  Defaulting to '80'.");
+  port = 80;
 }
 ----
 
-For most cases, there's better ways to interact with `FP` data
-than directly accessing fields, which will be covered next.
+[#usage-props]
+=== Using Description properties (`hasData`, etc.)
+
+While `kind` provides an exact match, every `FP` also contains three flags
+providing a more general description of an object:
+`hasData`, `hasError`, `noValue`.
+
+This is overkill when only `Either` or `Literal` could be returned,
+but you could use these flags to filter out errors and empty values:
+
+.Example filtering by `hasError`, `noValue`
+[source,typescript]
+----
+if(portConfig.hasError) {
+  console.log("Error loading port!");
+} else if(portConfig.noValue) {
+  console.log("No port specified, will use default.");
+} else {
+  console.log(`Port configured as ${portConfig.data}`);
+}
+----
+
+[#usage-status]
+=== Using `status`
+
+All `FP` objects include a `status` code, intended to represent HTTP response status codes
+(or process exit codes).
+
+One could use these fields similar to the descriptor fields - e.g. responses with `status` in the range `300` - `500` are likely errors, and this could be compared similar to the last example using `hasError` - although we don't see why anyone would prefer this.
+
+However, if you are writing general middleware that formats `FP` objects into HTTP responses,
+you may find `status` useful.
+
+[#usage-util]
+=== Utility Methods
+
+The above examples used `FP` properties, but every `FP` object also includes utility
+methods.
+
+The first example used `kind` to set a default if `Empty` was found,
+however xref:fp.adoc#alt[`altValue()`] could avoid the entire `if`/`else` block.
+
+.Example with `altValue`
+[source,typescript]
+----
+const port = portConfig.altValue(80);
+----
+
+[#usage-instanceof]
+=== Using `instanceof`
+
+This method is least recommended, but in some environments, `instanceof` will work
+to determine the class hierarchy used to create the `FP` object.
+
+[source,typescript]
+----
+if(portConfig instanceof Literal) {
+  console.log("Port was configured!");
+} else {
+  console.log("No port configured, using defaults.");
+}
+----

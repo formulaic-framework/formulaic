@@ -2,12 +2,18 @@
   "name": "formulaic",
   "packageManager": "yarn@3.2.1",
   "private": true,
+  "scripts": {
+    "typedoc": "typedoc --name 'Formulaic Framework' --out out/typedoc/ --entryPointStrategy Packages .",
+    "serve:typedoc": "http-server out/typedoc -c-1"
+  },
   "workspaces": [
     "example/*",
     "packages/*"
   ],
   "devDependencies": {
     "@yarnpkg/sdks": "^3.0.0-rc.11",
+    "http-server": "^14.1.1",
+    "typedoc": "^0.23.10",
     "typescript": "^4.7.4"
   },
   "license": "MIT",

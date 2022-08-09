@@ -1,5 +1,5 @@
 import { getSchemaPath } from "@nestjs/swagger";
-import { AccessForbidden } from "../AccessForbidden";
+import { AccessForbidden } from "../not-found/AccessForbidden";
 import { MissingPermission } from "../MissingPermission";
 import { oneOfFP } from "./oneOfFP";
 

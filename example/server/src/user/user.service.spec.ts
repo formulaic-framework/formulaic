@@ -48,7 +48,7 @@ describe('UserService', () => {
     it("returns nothing without users (required=false)", async () => {
       expect.assertions(2);
       const users = await userService.listAll();
-      expect(users.kind).toBe("Data");
+      expect(users.kind).toBe("Literal");
       if(users.hasData === true) {
         expect(users.data.length).toBe(0);
       }
@@ -65,8 +65,8 @@ describe('UserService', () => {
         userService.createUser("test2", "password"),
       ]);
 
-      expect(created[0].kind).toBe("Data");
-      expect(created[1].kind).toBe("Data");
+      expect(created[0].kind).toBe("Literal");
+      expect(created[1].kind).toBe("Literal");
 
       const users = await userService.listAll(true);
       expect(users.length).toBe(2);

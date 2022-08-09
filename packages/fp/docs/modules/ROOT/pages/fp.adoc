@@ -1,0 +1,174 @@
+= Interface of an FP Object
+
+All FP types follow an interface defined in the library as an abstract class `FP`.
+
+[#kind]
+== `kind`
+
+All FP instances have a property `kind`, intended as an easily discriminated field to tell one type from another.
+
+If you extend an FP instance, you will need to include another property to discriminate between sub-types.
+
+This is used for `UnexpectedError`, which is intended to contain many different error types that developers might like
+to report as a generic "500 Server Error", without revealing details about where the error came from.
+
+The various implementations of `UnexpectedError` all use the kind `"UnexpectedError"`, and use a `code` property
+to distinguish between implementations.
+
+`kind` is good to narrow instances down to a specific interface,
+but FP also includes 3 files to provide a general description of items,
+which also describes how the chaining methods will operate.
+
+[#has-data]
+== `hasData`
+
+Objects can be marked "hasData", intended to signify "successful" responses that include data,
+including data successfully fetched from the database, or a response for the user marking an operation as completed without errors.
+
+[#has-error]
+== `hasError`
+
+Objects can be marked as "hasError", intended to signify a "failure" is being reported.
+
+[#no-value]
+== `noValue`
+
+The final flag is `noValue`, marking an absence of data without a specific error
+- similar to the empty case of `Maybe` (a structure in many functional languages/libraries).
+
+This is especially useful for some chaining methods - FP supports two classes of "fallback",
+one that replaces any "non-successful" response with the provided value,
+and one that only replaces a lack of value, but doesn't change errors.
+
+== Note on Chaining Methods
+
+Like Promise methods `.then` and `.catch`, FP instances have a set of common methods that allow data to be quickly transformed,
+and operations to be applied only if data exists.
+
+Unlike Promises, Formulaic's FP library generally does not try to call chaining methods on asynchronous values that have not been resolved yet.
+
+In the following example, `.catch` and `.then` may be called before the first value resolves.
+
+.Promise Chaining
+[source,typescript]
+----
+const response = Promise.resolve(10);
+const fallback = response.catch(e => -1);
+const mapped = fallback.then(i => i * 2);
+----
+
+However with FP, you should `await` asynchronous values before calling chaining methods:
+
+.Awaiting FP values
+[source,typescript]
+----
+async function getData(): Promise<Literal<number> | EntityNotFound<number>> {
+  return new Literal(10);
+}
+
+const value = await getData();
+const mapped = await value.chain(async i => Promise.resolve(i + 1));
+const second = await mapped.chain(async i => Promise.resolve(i * 2));
+----
+
+[#chain]
+== `chain()`
+
+FP's `.chain` works similar to Promise's `.then` - it expects an asynchronous transformation to be provided,
+does not call the given function if in an error state,
+and can switch to an error state if the provided transformation produces an error.
+
+.Performs Transformations
+[source,typescript]
+----
+const url = new Literal("http://example.com/");
+const fetched = await url.chain(async url => {
+  return await fetch(url);
+});
+----
+
+.Doesn't run unless "successful data"
+[source,typescript]
+----
+const missingUrl = new Empty();
+const fetchMissing = await missingUrl.chain(async url => {
+  // This code will never run, because 'Empty' isn't "successful data"
+  return new MissingPermission();
+}); // => Empty<string> // <.>
+----
+<.> Chaining methods are typed well enough that the transform will be completely ignored if TypeScript knows that there's no way `missingUrl` could be a data type.
+
+.Will keep returned FPs as-is (whether data, error, or another type)
+[source,typescript]
+----
+const failedFetch = await url.chain(async url => {
+  return new UnexpectedFailure();
+}); // => UnexpectedFailure
+----
+
+.Wraps non-FP results in `Literal` (to allow chaining)
+[source,typescript]
+----
+const input = new Literal(10);
+const formatted = input.chain(async num => {
+  return `Number: ${num}`;
+}); // => Literal<string>
+----
+
+[#map]
+== `map()`
+
+Map works the same as <<chain>> without using Promises.
+
+[source,typescript]
+----
+const input = new Literal(10);
+const output = input.map(i => i * 2);
+----
+
+[#or]
+== `or()`, `orValue()`, `orThen()`
+
+`or()` and `orValue()` take a fallback value that replaces any <<has-error>> or <<no-value>>
+FP.
+
+You can provide an FP instance, or a non-FP value that will be wrapped in `Literal`.
+
+[source,typescript]
+----
+const error = new UnexpectedFailure();
+const safe = error.orValue(new Literal(10));
+// => Literal<number>
+
+const safeCallback = error.or(() => {
+  return new Empty();
+});
+// => Empty<unknown>
+
+const empty = new Empty();
+const withDefault = empty.or(10);
+// => Literal<number>
+----
+
+[#alt]
+== `alt()`, `altValue()`, `altThen()`
+
+`alt` functions similar to `or`, taking in a fallback value (or a function that returns the fallback value).
+However, the fallback value is only used if <<no-value>>.
+
+This prevents hiding errors, while still allowing defaults.
+
+[source,typescript]
+----
+const dbTable = new EntityService<User>(/* ... */);
+
+const existingUser = await dbTable.findOne({ username: "admin" });
+// => Literal<User> | EntityNotFound<User> | DatabaseException<User, "findOne">
+
+const user = await existingUser.altThen(() => {
+  const user = new User();
+  user.username = "admin";
+  return dbTable.save(user);
+});
+// => Literal<User> | DatabaseException<User, "findOne"> | DatabaseException<User, "save">
+----

@@ -1,76 +1,76 @@
 = Formulaic's Data Types (FP)
 
-====
-Available on NPM as `@formulaic/fp`
-====
+Formulaic's Data Types library (called "FP" for short) provides a strongly-typed and chainable
+data format to use as return types.
 
-Most Formulaic packages use a {functional}[functional] approach to handling data,
-taking inspiration from {fp-ts} and other languages which support complex return types.
+== Installation
 
-.Demo of `@formulaic/fp` features
-[source,ts]
+FP is distributed on NPM as `@formulaic/fp`, and is also bundled into `@formulaic/api`.
+
+== Summary
+
+=== Better Visibility and Typing
+
+When it comes to error handling, both `Promise` and `catch` in TypeScript hide the type of errors. +
+FP takes inspiration from {fp-ts} and other {functional}[functional] approaches, and uses a structure
+similar to `Either` from {fp-ts}:
+
+[source,typescript]
 ----
-import {
-  AccessForbidden,
-  Data,
-  EntityNotFound,
-  NotFound,
-} from "@formulaic/fp";
-import { ApiProperty } from "@nestjs/swagger";
-import { Expose, instanceToPlain } from "class-transformer";
+import { Literal, Empty } from "@formulaic/fp";
 
-class SecureNote {
-  @ApiProperty()
-  @Expose() // <.>
-  kind: "SecureNote";
-
-  /**
-   * A unique identifier.
-   */
-  @ApiProperty()
-  @Expose()
-  id: string;
-  /**
-   * A list of usernames that can read this file.
-   */
-  canRead: string[];
-  /**
-   * The contents of the note.
-   */
-  @ApiProperty()
-  @Expose()
-  message: string;
-}
-
-var notes: SecureNote[] = [ /* ... */ ];
-
-async function getNote(
-  username: string,
-  noteId: string,
-): Promise<Data<SecureNote> | NotFound<SecureNote, "Note">> {
-  const note = notes.find(note => note.id = noteId);
-  if(!note) {
-    return new EntityNotFound("Note", { id });
-  }
-  if(!note.canRead.includes(username)) {
-    return new AccessForbidden("Note");
-  }
-  return new Data(note);
-}
-
-async function main() {
-  const note = await getNote("test", "myNote123");
-  const modified = note.mapData(data => data); // <.>
-  const formatted = instanceToPlain(modified, {
-    groups: [
-      "structure",
-      // "exposeForbidden", // <.>
-    ],
-  );
-  // => SecureNote { kind: "SecureNote", id, message } or
-  // => NotFound { kind: "NotFound", status: 404, entityName: "Note" }
+function getData(): Literal<number> | Empty<number> {
+  const success: boolean = coinFlip();
+  return success ? new Literal(10) : new Empty();
 }
 ----
-<.> `@Expose` will be used by `class-transformer` to filter output
-<.> `@formulaic/fp` includes utilities like `.mapData` which can alter successful values - this is similar to `Promise.then`.
-<.> `@formulaic/fp` built-in types come configured for `class-transformer` - unless you provide either `"exposeForbidden"` or `"debug"`, `AccessForbidden` and `EntityNotFound` will appear to the user as the same object for security.
+
+=== Chaining
+
+All FP classes support chaining, similar to the `.then` method on Promises:
+
+[source,typescript]
+----
+const x = new Literal(10);
+const afterAddition = x.map(i => i + 10);
+const afterDivision = await afterAddition.chain(async i => await Promise.resolve(i / 4));
+expect(afterDivision.data).toBe(5);
+----
+
+Calling `.then` on a rejected Promise does nothing (and keeps the value the same) -
+all chaining methods from `FP` do the same.
+
+[source,typescript]
+----
+const x = new Empty<number>();
+const afterAddition = x.map(i => i + 10); // => still Empty<number>, function is not called
+----
+
+=== Transformation
+
+FP objects are easy to configure via {class-transformer}, and even come with some basic transformation rules built-in.
+
+[source,typescript]
+----
+import { AccessForbidden, EntityNotFound } from "@formulaic/fp";
+
+@Controller()
+export class SampleController {
+
+  @Get("/secret")
+  public getSecret() {
+    return new AccessForbidden();
+  }
+
+  @Get("/misspelled-pgae")
+  public getUnknownEntity() {
+    return new EntityNotFound();
+  }
+
+}
+----
+
+If you use a `class-transformer` utility, like Formulaic's {fp-interceptor}, the two routes in the example above will
+produce the same `404` response to hide whether a page exists or not if the user doesn't have permission thanks to the default `class-transformer` configuration.
+
+However, your backend (and developers, if running the server with `NODE_ENV=development`) will be able to tell the two cases apart.
