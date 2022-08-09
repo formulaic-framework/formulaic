@@ -1,4 +1,3 @@
-import { Transformer } from "../transformers";
 import { Data } from "./Data";
 import type { Alt, FPFields, MapFP, Or } from "./util";
 
