@@ -1,4 +1,6 @@
+import { Literal } from "../Literal";
 import { Data } from "./Data";
+import { isFP } from "./FP";
 import { EnsureFP, MapFP } from "./util";
 
 /**
@@ -17,6 +19,13 @@ export abstract class DataFP extends Data<any> {
 
   public override chain<O>(fn: (data: this) => Promise<O>): Promise<MapFP<this, O, never>> {
     return this.processThen(this, fn) as Promise<EnsureFP<O>> as Promise<MapFP<this, O, never>>;
+  }
+
+  protected override ensureFP<O>(value: O): EnsureFP<O> {
+    if(isFP(value)) {
+      return value as EnsureFP<O>;
+    }
+    return new Literal(value) as EnsureFP<O>;
   }
 
 }

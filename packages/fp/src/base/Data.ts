@@ -1,5 +1,4 @@
-import { FP, isFP } from "./FP";
-import { Literal } from "../Literal";
+import { FP } from "./FP";
 import { Alt, EnsureFP, Or } from "./util";
 
 /**
@@ -55,11 +54,6 @@ export abstract class Data<T> extends FP<T> {
     return this.ensureFP(resolved);
   }
 
-  protected ensureFP<O>(value: O): EnsureFP<O> {
-    if(isFP(value)) {
-      return value as EnsureFP<O>;
-    }
-    return new Literal(value) as EnsureFP<O>;
-  }
+  protected abstract ensureFP<O>(value: O): EnsureFP<O>;
 
 }

@@ -1,4 +1,5 @@
 import { Data } from "./base/Data";
+import { isFP } from "./base/FP";
 import { EnsureFP, MapFP } from "./base/util";
 
 /**
@@ -34,7 +35,7 @@ export class Literal<T> extends Data<T> {
     return this.processThen(this.data, fn) as Promise<EnsureFP<O>> as Promise<MapFP<this, O, never>>;
   }
 
-  public get [Symbol.toStringTag]() {
+  public override get [Symbol.toStringTag]() {
     return `Literal<${typeof this.data}>`;
   }
 
@@ -66,6 +67,13 @@ export class Literal<T> extends Data<T> {
         return options.stylize(this.data, "number");
     }
     return JSON.stringify(this.data);
+  }
+
+  protected ensureFP<O>(value: O): EnsureFP<O> {
+    if(isFP(value)) {
+      return value as EnsureFP<O>;
+    }
+    return new Literal(value) as EnsureFP<O>;
   }
 
 }
