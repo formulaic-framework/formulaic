@@ -21,6 +21,9 @@
     "type": "git",
     "url": "https://github.com/formulaic-framework/formulaic.git"
   },
+  "resolutions": {
+    "terser-webpack-plugin@npm:5.3.3/terser": "5.14.2"
+  },
   "author": {
     "name": "Flyyn"
   }

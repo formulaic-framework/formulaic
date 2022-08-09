@@ -85,3 +85,15 @@ jobs:
             workflow_id: 'hook.yml',
             ref: 'main',
           });
+
+    - name: 'Trigger documentation build (beta docs)'
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.PAT }}
+        script: |
+          github.rest.actions.createWorkflowDispatch({
+            owner: 'formulaic-framework',
+            repo: 'next',
+            workflow_id: 'hook.yml',
+            ref: 'main',
+          });
