@@ -6,6 +6,7 @@ import { isFP } from "./FP";
 import { Literal } from "../Literal";
 import { MissingPermission } from "../MissingPermission";
 import { DatabaseException } from "../DatabaseException";
+import { UnexpectedError } from "../UnexpectedError";
 
 function expectFP<Kinds extends string, Needle extends Kinds>(kind: Kinds, search: Needle): asserts kind is Needle {
   expect(kind).toBe(search);
@@ -211,6 +212,35 @@ describe("FP (typing)", () => {
       expect<"Literal" | "Empty">(y.kind).toBe("Literal");
       expectFP(z.kind, "Literal");
       expect(z.data).toBe("Number 10");
+    });
+
+    it("transforms correctly if an FP is returned (Literal)", () => {
+      const err = new UnexpectedError<string>();
+      const y = err.map(() => new Literal(10));
+      /**
+       * TODO: Currently failing: 'y' is currently typed as UnexpectedError<Literal<number>, any>
+       *
+       * Created as an example of bug https://github.com/formulaic-framework/formulaic/issues/23
+       */
+      const z: UnexpectedError<number> = y;
+    });
+
+    it("transforms correctly if an FP is returned (union type)", () => {
+      const err = new UnexpectedError<string>();
+      const branch = true as boolean;
+      const y = err.map(() => {
+        if(branch) {
+          return new Literal("Hi");
+        } else {
+          return new Empty<string>();
+        }
+      });
+      /**
+       * TODO: Currently failing: 'y' is currently typed as UnexpectedError<Literal<string> | Empty<string>, any>
+       *
+       * Created as an example of bug https://github.com/formulaic-framework/formulaic/issues/23
+       */
+      const z: UnexpectedError<string> = y;
     });
 
   });
