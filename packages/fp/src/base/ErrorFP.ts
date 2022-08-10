@@ -61,7 +61,7 @@ export abstract class BaseErrorFP<
     this.error = error;
   }
 
-  protected ensureFP<O>(value: O): EnsureFP<O> {
+  protected override ensureFP<O>(value: O): EnsureFP<O> {
     if(isFP(value)) {
       return value as EnsureFP<O>;
     }
