@@ -1,5 +1,13 @@
 import type { Literal } from "../Literal";
 
+type KindSpec<K extends string>
+  = K
+  | { kind: K };
+
+export type KindSelection<K extends string>
+  = KindSpec<K>
+  | KindSpec<K>[];
+
 export type FPFields<T extends {
   kind: string;
   status: number;
@@ -29,3 +37,9 @@ export type MapFP<
   O,
   Return,
 > = T extends { hasData: true } ? EnsureFP<O> : Return;
+
+export type MapFPIf<
+  T extends { kind: string },
+  K,
+  O,
+> = T extends { kind: K } ? EnsureFP<O> : T;

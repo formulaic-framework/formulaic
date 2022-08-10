@@ -215,6 +215,48 @@ describe("FP (typing)", () => {
 
   });
 
+  describe("mapIf", () => {
+
+    it("transforms data", () => {
+      const x = new Literal(10);
+      const y = x.mapIf(Literal, i => `Hello ${i.data}`);
+      const z: Literal<string> = y;
+      expect<"Literal">(y.kind).toBe("Literal");
+      expectFP(z.kind, "Literal");
+      expect(z.data).toBe("Hello 10");
+    });
+
+    it("returns itself if kind doesn't match", () => {
+      const x = new Literal(10);
+      const y = x.mapIf("InvalidFP", i => `Hello ${i.data}`);
+      const z: Literal<number> = y;
+      expect<"Literal">(y.kind).toBe("Literal");
+      expectFP(z.kind, "Literal");
+      expect(z.data).toBe(10);
+    });
+
+    it("transforms types when input could be multiple types", () => {
+      const x = new Literal(10) as Literal<number> | Empty<number>;
+      const y = x.mapIf("Literal", (i: Literal<number> | Empty<number>) => {
+        return new MissingPermission<number>();
+      });
+      const z: Empty<number> | MissingPermission<number> = y;
+      expect<"Empty" | "MissingPermission">(y.kind).toBe("MissingPermission");
+      expectFP(z.kind, "MissingPermission");
+    });
+
+    it("can use shortcut 'typeof' to type 'data' parameter", () => {
+      const x = new Literal(10) as Literal<number> | Empty<number>;
+      const y = x.mapIf("Empty", (i: typeof x) => {
+        const z: Literal<number> | Empty<number> = i;
+        return new MissingPermission<number>();
+      });
+      const z: Literal<number> | MissingPermission<number> = y;
+      expectFP(z.kind, "Literal");
+    });
+
+  });
+
 });
 
 describe("isFP", () => {

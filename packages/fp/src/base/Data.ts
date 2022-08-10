@@ -54,6 +54,4 @@ export abstract class Data<T> extends FP<T> {
     return this.ensureFP(resolved);
   }
 
-  protected abstract ensureFP<O>(value: O): EnsureFP<O>;
-
 }

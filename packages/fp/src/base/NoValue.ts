@@ -52,7 +52,7 @@ export abstract class NoValue<T> extends FP<T> {
     return this as MapFP<this, O, FPFields<this>>;
   }
 
-  protected ensureFP<O>(value: O): EnsureFP<O> {
+  protected override ensureFP<O>(value: O): EnsureFP<O> {
     if(isFP(value)) {
       return value as EnsureFP<O>;
     }

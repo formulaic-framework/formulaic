@@ -1,15 +1,6 @@
-import { Data } from "./Data";
-import type { Alt, FPFields, MapFP, Or } from "./util";
+import type { Alt, EnsureFP, FPFields, KindSelection, MapFP, MapFPIf, Or } from "./util";
 
 const inspect = Symbol.for("nodejs.util.inspect.custom");
-
-export type EnsureData<O> = O extends { kind: string } ? O : Data<O>;
-
-export type MapFPIf<ThisType extends FP<any>, K extends string, O> = ThisType extends { kind: K } ? EnsureData<O> : ThisType;
-
-export type MapFPUnless<ThisType extends FP<any>, K extends string, O> = ThisType extends { kind: K } ? ThisType : EnsureData<O>;
-
-export type MapFPData<T, ThisType extends FP<T>, O> = ThisType extends Data<T> ? EnsureData<O> : ThisType;
 
 /**
  * A base class for data that allows for strong-typing, even in error cases, and is chainable for easy use.
@@ -139,11 +130,45 @@ export abstract class FP<T> {
   public abstract map<O>(fn: (data: T) => O): MapFP<this, O, FPFields<this>>;
 
   /**
+   * Transforms data that match the `kind` specified, returning the output from the transformation function
+   * instead of any entities that match the filter.
+   *
+   * Useful for changing specific error types and similar transformations.
+   *
+   * See {@link map} for a more efficient way to transform "success data", {@link or} to transform any non-"success data" response,
+   * and {@link altValue} to transform any "empty" response.
+   *
+   * @param kind The kind(s) that should be transformed.
+   * @param fn A function that is called with any objects that match the selected {@link kind}.
+   *
+   * @example
+   * const data = new UnexpectedError() as Literal<number> | UnexpectedError<number> | Empty<number>;
+   * const transformed = data.mapIf([UnexpectedError], (err) => new MissingPermission<number>());
+   * // => Literal<number> | MissingPermission<number> | Empty<number>
+   */
+  public mapIf<K extends string, O>(kind: KindSelection<K>, fn: (data: this) => O): MapFPIf<this, K, O> {
+    if(this.matchKind(kind)) {
+      const mapped = fn(this);
+      return this.ensureFP(mapped) as unknown as MapFPIf<this, K, O>;
+    }
+    return this as MapFPIf<this, K, O>;
+  }
+
+  /**
    * Asynchronously transform "success data" (if `hasData == true`), while leaving empty values or errors alone.
    *
    * @param fn A function that transforms the current value.
    */
   public abstract chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, FPFields<this>>>;
+
+  protected matchKind<K extends string>(kind: KindSelection<K>): this is { kind: K } {
+    if(Array.isArray(kind)) {
+      return kind.some(spec => typeof spec === "string" ? this.kind === spec : this.kind === spec.kind);
+    }
+    return this.kind === (typeof kind === "string" ? kind : kind.kind);
+  }
+
+  protected abstract ensureFP<O>(value: O): EnsureFP<O>;
 
   public get [Symbol.toStringTag](): string {
     return this.kind;
