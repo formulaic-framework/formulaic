@@ -5,7 +5,7 @@ import { Empty } from "../Empty";
 import { Literal } from "../Literal";
 import { DataFP } from "./DataFP";
 
-export class LoginResponse extends DataFP {
+export class LoginResponse extends DataFP<"LoginResponse"> {
   public static readonly kind = "LoginResponse";
 
   @ApiProperty()

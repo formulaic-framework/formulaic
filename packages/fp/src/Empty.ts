@@ -1,7 +1,8 @@
+import { ExtractFPType } from "./base/FP";
 import { NoValue } from "./base/NoValue";
 import { MapFP } from "./base/util";
 
-export class Empty<T = any> extends NoValue<T> {
+export class Empty<T = any> extends NoValue<T, "Empty", 404> {
   public static readonly kind = "Empty";
 
   public override readonly kind: "Empty";
@@ -13,12 +14,12 @@ export class Empty<T = any> extends NoValue<T> {
     this.status = 404;
   }
 
-  public override map<O>(fn: (value: T) => O): MapFP<this, O, Empty<O>> {
-    return this as unknown as MapFP<this, O, Empty<O>>;
+  public override map<O>(fn: (value: T) => O): Empty<ExtractFPType<O>> {
+    return this as unknown as Empty<ExtractFPType<O>>;
   }
 
-  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<MapFP<this, O, Empty<O>>> {
-    return this as unknown as MapFP<this, O, Empty<O>>;
+  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<Empty<ExtractFPType<O>>> {
+    return this as unknown as Empty<ExtractFPType<O>>;
   }
 
 }

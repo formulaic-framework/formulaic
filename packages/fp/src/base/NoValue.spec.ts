@@ -1,7 +1,7 @@
 import { UnexpectedError } from "../UnexpectedError";
 import { NoValue } from "./NoValue";
 
-class NoValueImpl<T> extends NoValue<T> {
+class NoValueImpl<T> extends NoValue<T, "NoValueImpl", 404> {
   public override readonly kind: "NoValueImpl";
   public override readonly status: 404;
 

@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
+import { ExtractFPType } from "./base/FP";
 import { MapFP } from "./base/util";
 import { UnexpectedError } from "./UnexpectedError";
 
@@ -25,12 +26,12 @@ export class DatabaseException<
     this.method = method;
   }
 
-  public override map<O>(fn: (data: T) => O): MapFP<this, O, DatabaseException<O, Method, ErrorType>> {
-    return this as unknown as MapFP<this, O, DatabaseException<O, Method, ErrorType>>;
+  public override map<O>(fn: (data: T) => O): DatabaseException<ExtractFPType<O>, Method, ErrorType> {
+    return this as unknown as DatabaseException<ExtractFPType<O>, Method, ErrorType>;
   }
 
-  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, DatabaseException<O, Method, ErrorType>>> {
-    return this as unknown as MapFP<this, O, DatabaseException<O, Method, ErrorType>>;
+  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<DatabaseException<ExtractFPType<O>, Method, ErrorType>> {
+    return this as unknown as DatabaseException<ExtractFPType<O>, Method, ErrorType>;
   }
 
 }

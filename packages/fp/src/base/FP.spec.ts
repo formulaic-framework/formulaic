@@ -275,7 +275,7 @@ describe("FP (typing)", () => {
       expectFP(z.kind, "MissingPermission");
     });
 
-    it("can use shortcut 'typeof' to type 'data' parameter", () => {
+    it("can use shortcut 'typeof' to type 'data' parameter (type check)", () => {
       const x = new Literal(10) as Literal<number> | Empty<number>;
       const y = x.mapIf("Empty", (i: typeof x) => {
         const z: Literal<number> | Empty<number> = i;
@@ -283,6 +283,17 @@ describe("FP (typing)", () => {
       });
       const z: Literal<number> | MissingPermission<number> = y;
       expectFP(z.kind, "Literal");
+    });
+
+    it("can use shortcut 'typeof' to type 'data' parameter (example)", () => {
+      const x = new Literal(10) as Literal<number> | Empty<number>;
+      const y = x.mapIf("Literal", (i: typeof x) => {
+        if(i.hasData) {
+          return `hi ${i.data}`;
+        }
+      });
+      expectFP(y.kind, "Literal");
+      expect(y.data).toBe("hi 10");
     });
 
   });

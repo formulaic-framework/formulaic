@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
+import { ExtractFPType } from "../base/FP";
 import { MapFP } from "../base/util";
 import { NotFound } from "./NotFound";
 
@@ -31,12 +32,12 @@ export class EntityNotFound<
     this.findOptions = findOptions;
   }
 
-  public override map<O>(fn: (data: T) => O): MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>> {
-    return this as unknown as MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>>;
+  public override map<O>(fn: (data: T) => O): EntityNotFound<ExtractFPType<O>, EntityType, EntityName, FindOptions> {
+    return this as unknown as EntityNotFound<ExtractFPType<O>, EntityType, EntityName, FindOptions>;
   }
 
-  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>>> {
-    return this as unknown as MapFP<this, O, EntityNotFound<O, EntityType, EntityName, FindOptions>>;
+  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<EntityNotFound<ExtractFPType<O>, EntityType, EntityName, FindOptions>> {
+    return this as unknown as EntityNotFound<ExtractFPType<O>, EntityType, EntityName, FindOptions>;
   }
 
 }

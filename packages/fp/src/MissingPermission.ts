@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ErrorFP } from "./base/ErrorFP";
+import { ExtractFPType } from "./base/FP";
 import { MapFP } from "./base/util";
 
 /**
@@ -9,7 +10,7 @@ import { MapFP } from "./base/util";
  * use {@link AccessForbidden} if evaluating the user's ability relative to a specific document, which can avoid
  * revealing the existence of hidden information.
  */
-export class MissingPermission<T> extends ErrorFP<T> {
+export class MissingPermission<T> extends ErrorFP<T, "MissingPermission", 401> {
   public static readonly kind = "MissingPermission";
 
   @ApiProperty()
@@ -24,11 +25,11 @@ export class MissingPermission<T> extends ErrorFP<T> {
     this.status = 401;
   }
 
-  public override map<O>(fn: (value: T) => O): MapFP<this, O, MissingPermission<O>> {
-    return this as unknown as MapFP<this, O, MissingPermission<O>>;
+  public override map<O>(fn: (value: T) => O): MissingPermission<ExtractFPType<O>> {
+    return this as unknown as MissingPermission<ExtractFPType<O>>;
   }
 
-  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<MapFP<this, O, MissingPermission<O>>> {
-    return this as unknown as MapFP<this, O, MissingPermission<O>>;
+  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<MissingPermission<ExtractFPType<O>>> {
+    return this as unknown as MissingPermission<ExtractFPType<O>>;
   }
 }
