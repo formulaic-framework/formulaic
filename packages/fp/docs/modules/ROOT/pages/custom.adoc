@@ -14,7 +14,7 @@ import { Expose } from "class-transformer";
 import { Equals, IsIn, IsJWT, IsString } from "class-validator";
 import { DataFP } from "./DataFP";
 
-export class LoginResponse extends DataFP {
+export class LoginResponse extends DataFP<"LoginResponse", 200 | 201> {
   public static readonly kind = "LoginResponse"; // <1>
 
   @ApiProperty() // <2>
