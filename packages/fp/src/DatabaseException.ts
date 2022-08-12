@@ -1,7 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { ExtractFPType } from "./base/FP";
-import { MapFP } from "./base/util";
 import { UnexpectedError } from "./UnexpectedError";
 
 export class DatabaseException<

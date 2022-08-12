@@ -1,5 +1,5 @@
-import type { KindSelection, MapFPIf } from "./util";
 import type { Literal } from "../Literal";
+import { KindSelection } from "./util";
 
 const inspect = Symbol.for("nodejs.util.inspect.custom");
 

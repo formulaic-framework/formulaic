@@ -3,7 +3,6 @@ import { Expose, Transform } from "class-transformer";
 import { serializeError } from "serialize-error";
 import { ErrorFP } from "./base/ErrorFP";
 import { ExtractFPType } from "./base/FP";
-import { MapFP } from "./base/util";
 
 /**
  * Describes unexpected encountered on the server-side.
