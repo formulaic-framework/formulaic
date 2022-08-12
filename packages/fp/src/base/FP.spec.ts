@@ -296,6 +296,39 @@ describe("FP (typing)", () => {
       expect(y.data).toBe("hi 10");
     });
 
+    it("can select multiple types (Literal)", () => {
+      const x = new Literal(10) as Literal<number> | Empty<number>;
+      const y = x.mapIf(["Literal", "Empty"], (i: typeof x) => {
+        if(i.hasData) {
+          return `hi ${i.data}`;
+        }
+        return "empty";
+      });
+      expect(y.data).toBe("hi 10");
+    });
+
+    it("can select multiple types (Empty)", () => {
+      const x = new Empty() as Literal<number> | Empty<number>;
+      const y = x.mapIf(["Literal", "Empty"], (i: typeof x) => {
+        if(i.hasData) {
+          return `hi ${i.data}`;
+        }
+        return "empty";
+      });
+      expect(y.data).toBe("empty");
+    });
+
+    it("can select multiple types via class constructor", () => {
+      const x = new Literal(10) as Literal<number> | Empty<number>;
+      const y = x.mapIf([Literal, Empty], (i: typeof x) => {
+        if(i.hasData) {
+          return `hi ${i.data}`;
+        }
+        return "empty";
+      });
+      expect(y.data).toBe("hi 10");
+    });
+
   });
 
 });
