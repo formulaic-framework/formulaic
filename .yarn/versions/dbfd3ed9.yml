@@ -1,8 +1,0 @@
-releases:
-  "@formulaic/api": major
-  "@formulaic/entity-service": major
-  "@formulaic/fp": major
-  "@formulaic/fp-interceptor": major
-
-declined:
-  - server
