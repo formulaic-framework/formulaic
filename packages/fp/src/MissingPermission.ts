@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { ErrorFP } from "./base/ErrorFP";
 import { ExtractFPType } from "./base/FP";
-import { MapFP } from "./base/util";
 
 /**
  * Report that a user is completely missing the permission for a broad action.

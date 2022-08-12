@@ -23,12 +23,16 @@ export { MissingPermission } from "./MissingPermission";
 export { UnexpectedError } from "./UnexpectedError";
 
 // Utilities
-export { isFP } from "./base/FP";
 export {
   Alt,
   EnsureFP,
-  FPFields,
-  MapFP,
+  ExtractFPType,
+  Map,
+  MapIf,
   Or,
+  isFP,
+} from "./base/FP";
+export {
+  KindSelection,
 } from "./base/util";
 export { FPConstructor, oneOfFP } from "./util/oneOfFP";

@@ -1,6 +1,5 @@
 import { ExtractFPType } from "./base/FP";
 import { NoValue } from "./base/NoValue";
-import { MapFP } from "./base/util";
 
 export class Empty<T = any> extends NoValue<T, "Empty", 404> {
   public static readonly kind = "Empty";

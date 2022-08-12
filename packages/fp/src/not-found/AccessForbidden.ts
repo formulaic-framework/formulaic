@@ -1,5 +1,4 @@
 import { ExtractFPType } from "../base/FP";
-import { MapFP } from "../base/util";
 import { NotFound } from "./NotFound";
 
 /**
