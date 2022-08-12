@@ -2,13 +2,14 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose, Transform } from "class-transformer";
 import { serializeError } from "serialize-error";
 import { ErrorFP } from "./base/ErrorFP";
+import { ExtractFPType } from "./base/FP";
 import { MapFP } from "./base/util";
 
 /**
  * Describes unexpected encountered on the server-side.
  * This is a catch-all equivalent for a 500 Internal Server Error.
  */
-export class UnexpectedError<T, Err = any> extends ErrorFP<T> {
+export class UnexpectedError<T, Err = any> extends ErrorFP<T, "UnexpectedError", Err, 500> {
   public static readonly kind = "UnexpectedError";
 
   @ApiProperty()
@@ -54,12 +55,12 @@ export class UnexpectedError<T, Err = any> extends ErrorFP<T> {
     this.serializedError = error ? JSON.stringify(serializeError(error)) : undefined;
   }
 
-  public override map<O>(fn: (data: T) => O): MapFP<this, O, UnexpectedError<O, Err>> {
-    return this as unknown as MapFP<this, O, UnexpectedError<O, Err>>;
+  public override map<O>(fn: (data: T) => O): UnexpectedError<ExtractFPType<O>, Err> {
+    return this as unknown as UnexpectedError<ExtractFPType<O>, Err>;
   }
 
-  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, UnexpectedError<O, Err>>> {
-    return this as unknown as MapFP<this, O, UnexpectedError<O, Err>>;;
+  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<UnexpectedError<ExtractFPType<O>, Err>> {
+    return this as unknown as UnexpectedError<ExtractFPType<O>, Err>;;
   }
 
 }

@@ -1,5 +1,4 @@
-import { FP } from "./FP";
-import { Alt, EnsureFP, Or } from "./util";
+import { EnsureFP, FP } from "./FP";
 
 /**
  * One of the {@link FP} core interfaces that represents "successful" data.
@@ -8,7 +7,7 @@ import { Alt, EnsureFP, Or } from "./util";
  * - if you are returning arbitrary data and don't want to create a FP class, use {@link Literal}.
  * - if you are creating your own FP classes, you likely want to extend {@link DataFP}.
  */
-export abstract class Data<T> extends FP<T> {
+export abstract class Data<T, Kind extends string, Status extends number = 200 | 201> extends FP<T, Kind, Status, true, false, false> {
   public override readonly hasData: true;
   public override readonly hasError: false;
   public override readonly noValue: false;
@@ -20,28 +19,28 @@ export abstract class Data<T> extends FP<T> {
     this.noValue = false;
   }
 
-  public override alt<O>(fn: () => O): Alt<this, O> & this {
-    return this as this as (Alt<this, O> & this);
+  public override alt<O>(fn: () => O): this {
+    return this;
   }
 
-  public override async altThen<O>(fn: () => Promise<O>): Promise<Alt<this, O> & this> {
-    return this as this as (Alt<this, O> & this);
+  public override async altThen<O>(fn: () => Promise<O>): Promise<this> {
+    return this;
   }
 
-  public override altValue<O>(value: O): Alt<this, O> & this {
-    return this as this as (Alt<this, O> & this);
+  public override altValue<O>(value: O): this {
+    return this;
   }
 
-  public override or<O>(fn: () => O): Or<this, O> & this {
-    return this as this as (Or<this, O> & this);
+  public override or<O>(fn: () => O): this {
+    return this;
   }
 
-  public override async orThen<O>(fn: () => Promise<O>): Promise<Or<this, O> & this> {
-    return this as this as (Or<this, O> & this);
+  public override async orThen<O>(fn: () => Promise<O>): Promise<this> {
+    return this;
   }
 
-  public override orValue<O>(value: O): Or<this, O> & this {
-    return this as this as (Or<this, O> & this);
+  public override orValue<O>(value: O): this {
+    return this;
   }
 
   protected processMap<I,O>(input: I, fn: (data: I) => O): EnsureFP<O> {

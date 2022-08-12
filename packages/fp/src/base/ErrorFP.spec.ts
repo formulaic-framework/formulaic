@@ -1,15 +1,14 @@
 import { Empty } from "../Empty";
 import { BaseErrorFP, ErrorFP } from "./ErrorFP";
-import { Alt } from "./util";
 
-class TestBaseErrorFP<T> extends BaseErrorFP<T, ReferenceError, 500, false> {
-  public alt<O>(fn: () => O): Alt<this, O> {
+class TestBaseErrorFP<T> extends BaseErrorFP<T, "TestBaseErrorFP", ReferenceError, 500, false> {
+  public alt<O>(fn: () => O): this {
     throw new Error("Method not implemented.");
   }
-  public altThen<O>(value: () => Promise<O>): Promise<Alt<this, O>> {
+  public altThen<O>(value: () => Promise<O>): Promise<this> {
     throw new Error("Method not implemented.");
   }
-  public altValue<O>(value: O): Alt<this, O> {
+  public altValue<O>(value: O): this {
     throw new Error("Method not implemented.");
   }
   public kind: "TestBaseErrorFP";
@@ -20,7 +19,7 @@ class TestBaseErrorFP<T> extends BaseErrorFP<T, ReferenceError, 500, false> {
   }
 }
 
-class TestErrorFP<T> extends ErrorFP<T, ReferenceError, number> {
+class TestErrorFP<T> extends ErrorFP<T, "TestErrorFP", ReferenceError, number> {
   public kind: "TestErrorFP";
 
   public constructor() {

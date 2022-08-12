@@ -1,6 +1,5 @@
-import { FP, isFP } from "./FP";
+import { EnsureFP, ExtractFPType, FP, isFP } from "./FP";
 import { Literal } from "../Literal";
-import { Alt, EnsureFP, MapFP, Or } from "./util";
 
 /**
  * One of the {@link FP} core interfaces, representing responses that have some failure
@@ -16,10 +15,11 @@ import { Alt, EnsureFP, MapFP, Or } from "./util";
  */
 export abstract class BaseErrorFP<
   T,
+  Kind extends string,
   ErrorValue = any,
   StatusCode extends number = number,
   NoValue extends boolean = boolean,
-> extends FP<T> {
+> extends FP<T, Kind, StatusCode, false, true, NoValue> {
   public override readonly status: StatusCode;
   public override readonly hasData: false;
   public override readonly hasError: true;
@@ -27,25 +27,25 @@ export abstract class BaseErrorFP<
 
   public readonly error?: ErrorValue;
 
-  public override or<O>(fn: () => O): Or<this, O> & EnsureFP<O> {
+  public override or<O>(fn: () => O): EnsureFP<O> {
     const value = fn();
     return this.orValue(value);
   }
 
-  public override async orThen<O>(fn: () => Promise<O>): Promise<Or<this, O> & EnsureFP<O>> {
+  public override async orThen<O>(fn: () => Promise<O>): Promise<EnsureFP<O>> {
     return this.orValue(await fn());
   }
 
-  public override orValue<O>(value: O): Or<this, O> & EnsureFP<O> {
-    return this.ensureFP(value) as (Or<this, O> & EnsureFP<O>);
+  public override orValue<O>(value: O): EnsureFP<O> {
+    return this.ensureFP(value);
   }
 
-  public override map<O>(fn: (value: T) => O): MapFP<this, O, BaseErrorFP<O, ErrorValue, StatusCode, NoValue>> {
-    return this as unknown as BaseErrorFP<O, ErrorValue, StatusCode, NoValue> as MapFP<this, O, BaseErrorFP<O, ErrorValue, StatusCode, NoValue>>;
+  public override map<O>(fn: (value: T) => O): BaseErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode, NoValue> {
+    return this as unknown as BaseErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode, NoValue>;
   }
 
-  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<MapFP<this, O, BaseErrorFP<O, ErrorValue, StatusCode, NoValue>>> {
-    return this as unknown as BaseErrorFP<O, ErrorValue, StatusCode, NoValue> as MapFP<this, O, BaseErrorFP<O, ErrorValue, StatusCode, NoValue>>;
+  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<BaseErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode, NoValue>> {
+    return this as unknown as BaseErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode, NoValue>;
   }
 
   public constructor(
@@ -65,7 +65,7 @@ export abstract class BaseErrorFP<
     if(isFP(value)) {
       return value as EnsureFP<O>;
     }
-    return new Literal(value) as EnsureFP<O>;
+    return new Literal(value) as FP<O, "Literal", 200 | 201, true, false, false> as EnsureFP<O>;
   }
 
 }
@@ -76,32 +76,33 @@ export abstract class BaseErrorFP<
  */
 export abstract class ErrorFP<
   T,
+  Kind extends string,
   ErrorValue = any,
   StatusCode extends number = number,
-> extends BaseErrorFP<T, ErrorValue, StatusCode, false> {
+> extends BaseErrorFP<T, Kind, ErrorValue, StatusCode, false> {
 
   public constructor(error?: ErrorValue, statusCode?: StatusCode) {
     super(false, statusCode, error);
   }
 
-  public override alt<O>(fn: () => O): Alt<this, O> & this {
-    return this as (Alt<this, O> & this);
+  public override alt<O>(fn: () => O): this {
+    return this;
   }
 
-  public override async altThen<O>(fn: () => Promise<O>): Promise<Alt<this, O> & this> {
-    return this as (Alt<this, O> & this);
+  public override async altThen<O>(fn: () => Promise<O>): Promise<this> {
+    return this;
   }
 
-  public override altValue<O>(value: O): Alt<this, O> & this {
-    return this as (Alt<this, O> & this);
+  public override altValue<O>(value: O): this {
+    return this;
   }
 
-  public override map<O>(fn: (value: T) => O): MapFP<this, O, ErrorFP<O, ErrorValue, StatusCode>> {
-    return this as unknown as ErrorFP<O, ErrorValue, StatusCode> as MapFP<this, O, ErrorFP<O, ErrorValue, StatusCode>>;
+  public override map<O>(fn: (value: T) => O): ErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode> {
+    return this as unknown as ErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode>;
   }
 
-  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<MapFP<this, O, ErrorFP<O, ErrorValue, StatusCode>>> {
-    return this as unknown as ErrorFP<O, ErrorValue, StatusCode> as MapFP<this, O, ErrorFP<O, ErrorValue, StatusCode>>;
+  public override async chain<O>(fn: (value: T) => Promise<O>): Promise<ErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode>> {
+    return this as unknown as ErrorFP<ExtractFPType<O>, Kind, ErrorValue, StatusCode>;
   }
 
 }

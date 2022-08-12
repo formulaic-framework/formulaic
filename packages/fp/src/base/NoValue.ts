@@ -1,6 +1,5 @@
-import { FP, isFP } from "./FP";
+import { EnsureFP, ExtractFPType, FP, isFP } from "./FP";
 import { Literal } from "../Literal";
-import { Alt, EnsureFP, FPFields, MapFP, Or } from "./util";
 
 /**
  * One of the {@link FP} core interfaces, representing responses that have not failed,
@@ -8,7 +7,7 @@ import { Alt, EnsureFP, FPFields, MapFP, Or } from "./util";
  *
  * In general, this is used to avoid `null` hell.
  */
-export abstract class NoValue<T> extends FP<T> {
+export abstract class NoValue<T, Kind extends string, Status extends number = 404> extends FP<T, Kind, Status, false, false, true> {
   public override readonly hasData: false;
   public override readonly hasError: false;
   public override readonly noValue: true;
@@ -20,43 +19,43 @@ export abstract class NoValue<T> extends FP<T> {
     this.noValue = true;
   }
 
-  public override alt<O>(fn: () => O): Alt<this, O> {
+  public override alt<O>(fn: () => O): EnsureFP<O> {
     return this.altValue(fn());
   }
 
-  public override async altThen<O>(fn: () => Promise<O>): Promise<Alt<this, O>> {
+  public override async altThen<O>(fn: () => Promise<O>): Promise<EnsureFP<O>> {
     return this.altValue(await fn());
   }
 
-  public override altValue<O>(value: O): Alt<this, O> {
-    return this.orValue(value) as EnsureFP<O> as Alt<this, O>;
+  public override altValue<O>(value: O): EnsureFP<O> {
+    return this.orValue(value);
   }
 
-  public override or<O>(fn: () => O): Or<this, O> {
+  public override or<O>(fn: () => O): EnsureFP<O> {
     return this.orValue(fn());
   }
 
-  public override async orThen<O>(fn: () => Promise<O>): Promise<Or<this, O>> {
+  public override async orThen<O>(fn: () => Promise<O>): Promise<EnsureFP<O>> {
     return this.orValue(await fn());
   }
 
-  public override orValue<O>(value: O): Or<this, O> {
-    return this.ensureFP(value) as EnsureFP<O> as Or<this, O>;
+  public override orValue<O>(value: O): EnsureFP<O> {
+    return this.ensureFP(value);
   }
 
-  public override map<O>(fn: (data: T) => O): MapFP<this, O, FPFields<this>> {
-    return this as MapFP<this, O, FPFields<this>>;
+  public override map<O>(fn: (data: T) => O): NoValue<ExtractFPType<O>, Kind, Status> {
+    return this as unknown as NoValue<ExtractFPType<O>, Kind, Status>;
   }
 
-  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, FPFields<this>>> {
-    return this as MapFP<this, O, FPFields<this>>;
+  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<NoValue<ExtractFPType<O>, Kind, Status>> {
+    return this as unknown as NoValue<ExtractFPType<O>, Kind, Status>;
   }
 
   protected override ensureFP<O>(value: O): EnsureFP<O> {
     if(isFP(value)) {
       return value as EnsureFP<O>;
     }
-    return new Literal(value) as EnsureFP<O>;
+    return new Literal(value) as FP<O, "Literal", 200 | 201, true, false, false> as EnsureFP<O>;
   }
 
 }

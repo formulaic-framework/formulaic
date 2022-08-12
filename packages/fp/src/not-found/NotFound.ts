@@ -6,7 +6,7 @@ import { NoValue } from "../base/NoValue";
  * Flexible class describing an entity that was not found,
  * or that the user lacks permission to view.
  */
-export class NotFound<T, EntityType, EntityName extends string> extends NoValue<T> {
+export class NotFound<T, EntityType, EntityName extends string> extends NoValue<T, "NotFound", 403 | 404> {
   public static readonly kind = "NotFound";
 
   @ApiProperty()

@@ -1,6 +1,5 @@
 import { Data } from "./base/Data";
-import { isFP } from "./base/FP";
-import { EnsureFP, MapFP } from "./base/util";
+import { EnsureFP, FP, isFP } from "./base/FP";
 
 /**
  * Simple instance of a {@link FP} {@link Data} class that simply wraps another data structure.
@@ -8,7 +7,7 @@ import { EnsureFP, MapFP } from "./base/util";
  * Allows you to represent arbitrary data (including non-objects) without defining a {@link FP} class,
  * however it nests all data under the `data` property.
  */
-export class Literal<T> extends Data<T> {
+export class Literal<T> extends Data<T, "Literal", 200 | 201> {
   public static readonly kind = "Literal";
 
   public override readonly kind: "Literal";
@@ -27,12 +26,12 @@ export class Literal<T> extends Data<T> {
     return this.data;
   }
 
-  public map<O>(fn: (data: T) => O): MapFP<this, O, never> {
-    return this.processMap(this.data, fn) as EnsureFP<O> as MapFP<this, O, never>;
+  public map<O>(fn: (data: T) => O): EnsureFP<O> {
+    return this.processMap(this.data, fn);
   }
 
-  public chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, never>> {
-    return this.processThen(this.data, fn) as Promise<EnsureFP<O>> as Promise<MapFP<this, O, never>>;
+  public chain<O>(fn: (data: T) => Promise<O>): Promise<EnsureFP<O>> {
+    return this.processThen(this.data, fn);
   }
 
   public override get [Symbol.toStringTag]() {
@@ -73,7 +72,7 @@ export class Literal<T> extends Data<T> {
     if(isFP(value)) {
       return value as EnsureFP<O>;
     }
-    return new Literal(value) as EnsureFP<O>;
+    return new Literal(value) as FP<O, "Literal", 200 | 201, true, false, false> as EnsureFP<O>;
   }
 
 }

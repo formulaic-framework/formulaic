@@ -1,3 +1,4 @@
+import { ExtractFPType } from "../base/FP";
 import { MapFP } from "../base/util";
 import { NotFound } from "./NotFound";
 
@@ -14,12 +15,12 @@ export class AccessForbidden<T, EntityType, EntityName extends string> extends N
     super(entityName, true);
   }
 
-  public override map<O>(fn: (data: T) => O): MapFP<this, O, AccessForbidden<O, EntityType, EntityName>> {
-    return this as unknown as MapFP<this, O, AccessForbidden<O, EntityType, EntityName>>;
+  public override map<O>(fn: (data: T) => O): AccessForbidden<ExtractFPType<O>, EntityType, EntityName> {
+    return this as unknown as AccessForbidden<ExtractFPType<O>, EntityType, EntityName>;
   }
 
-  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<MapFP<this, O, AccessForbidden<O, EntityType, EntityName>>> {
-    return this as unknown as MapFP<this, O, AccessForbidden<O, EntityType, EntityName>>;
+  public override async chain<O>(fn: (data: T) => Promise<O>): Promise<AccessForbidden<ExtractFPType<O>, EntityType, EntityName>> {
+    return this as unknown as AccessForbidden<ExtractFPType<O>, EntityType, EntityName>;
   }
 
 }

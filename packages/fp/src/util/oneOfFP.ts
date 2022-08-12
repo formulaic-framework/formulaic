@@ -1,7 +1,7 @@
 import { ApiResponseSchemaHost, getSchemaPath } from "@nestjs/swagger";
 import { FP } from "../base/FP";
 
-export type FPConstructor<Kind extends string, T extends FP<any>> = {
+export type FPConstructor<Kind extends string, T extends FP<any, any, any, any, any, any>> = {
   kind: Kind;
   new (...args: any[]): T & { kind: Kind };
 }

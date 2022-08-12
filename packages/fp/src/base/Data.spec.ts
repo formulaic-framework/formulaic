@@ -59,7 +59,7 @@ describe("Data", () => {
 
     it("is implemented for both Literal and DataFP", () => {
 
-      class ExampleData extends DataFP {
+      class ExampleData extends DataFP<"ExampleData", 200> {
         public override readonly kind: "ExampleData";
         public override readonly status: 200;
 
