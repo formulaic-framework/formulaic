@@ -1,1 +1,3 @@
 * xref:index.adoc[Overview]
+* Guides
+** xref:guide/network.adoc[]

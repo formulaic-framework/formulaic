@@ -1,0 +1,180 @@
+= Guide for MySQL, Postgres, etc.
+
+This document will guide you through configuring and using most of the features of ORMConfig,
+including network settings.
+
+Users of SQLite should view our guide for file-based databases instead.
+
+== Installation
+
+Install this utility via NPM, under `@formulaic/ormconfig`.
+
+== Configuration File
+
+We recommend storing your database configuration in a standalone file, so it can be used by
+TypeORM migrations, servers, and other utilities.
+
+We have found that creating a CommonJS file will provide compatibility with more tools.
+
+.`datasource.js`
+[source,js]
+----
+// @ts-check
+const { Config } = require("@formulaic/ormconfig");
+
+const config = new Config({
+  type: "mysql",
+
+  database: "myAppDB",
+});
+
+const options = config.toConnectionOptions();
+const dataSource = config.toDataSource();
+
+module.exports = { options, dataSource };
+----
+
+== Integrate with NestJS
+
+If you are using a NestJS server, you can use the `ConnectionOptions` to configure the TypeORM module.
+
+.`src/app.module.ts`
+[source,typescript]
+----
+import { TypeOrmModule } from "@nestjs/typeorm";
+
+process.env.ORM_ENV = "nest"; // <.>
+import { options } from "../datasource";
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot(options),
+    // ...
+  ],
+})
+export class AppModule {}
+----
+<.> This is optional, but we'll use it later in this guide when we load the database models.
+
+== Use with TypeORM Migrations
+
+[source,sh]
+----
+yarn typeorm migration:generate -d ormconfig.js test.sql
+----
+
+== Set the Hostname (and port)
+
+This library defaults to using `localhost` as the default hostname,
+with the default port for the database server.
+
+If your production environment uses a consistent database hostname that would be a good default,
+we recommend configuring the utility to use that hostname for production only.
+
+[source,typescript]
+----
+const config = new Config({
+  // ...
+  hostByNodeEnv: {
+    production: "db",
+  },
+});
+----
+
+The hostname and port can be overridden by environment variables
+`DB_HOST` and `DB_PORT` (respectively).
+
+== Set the Username/Password
+
+We recommend configuring a default username and password in `datasource.js` - this will provide
+a default that can be used in development.
+
+The username will default to `"admin"` if no other option is provided.
+
+[source,js]
+----
+const config = new Config({
+  // ...
+  user: "my-user",
+  pass: "developmentPassword",
+});
+----
+
+You can override the credentials via environment variables, which is how we recommend setting them in production.
+
+The variable names change depending on the database, to match the variables used by
+the official Docker images for each database.
+
+MySQL::
+`MYSQL_USER` (or `MYSQL_USER_FILE`) +
+`MYSQL_PASSWORD`, `MYSQL_PASSWORD_FILE`, `MYSQL_ROOT_PASSWORD`, or `MYSQL_ROOT_PASSWORD_FILE`
+
+Postgres and CockroachDB::
+`POSTGRES_USER` (or `POSTGRES_USER_FILE`) +
+`POSTGRES_PASSWORD` (or `POSTGRES_PASSWORD_FILE`)
+
+[#entities]
+== Load Database Entities
+
+We suggest defining database entities using the convention set by NestJS's TypeORM tutorial,
+which saves entities in files matching the pattern `<name>.entity.ts`.
+
+This utility will automatically load entities matching that pattern,
+as long as you provide `\__dirname`.
+footnote:[By providing `__dirname`, this module makes no assumptions about the filesystem, allowing it to run under Yarn Berry's virtual filesystem without any issues]
+
+[source,typescript]
+----
+const config = new Config({
+  // ...
+
+  __dirname,
+
+  // __dirname: path.join(__dirname, "../"), // <1>
+
+  // src: "src", <2>
+  // dist: "dist", <2>
+});
+----
+<1> Most defaults in this library assume that you place `datasource.js` next to `package.json`.
+    If you use an alternative location, you may wish to provide the location of `package.json` instead of the exact `__dirname` value.
+<2> This library defaults to paths that match the `tsconfig.json`
+    defined by NestJS's default boilerplate.  You may wish to override `src` and `dest`.
+
+The library will load entities from `\{__dirname}/\{dist}/\**/*.entity.js` by default.
+
+If you set `process.env.ORM_ENV = "nest";` in your Nest application,
+the library will use `\{__dirname}/src/\**/*.entity.ts` for Nest,
+ensuring you have the latest models without running a Typescript compilation.
+
+Multiple configuration options (including `src` and `dist`) exist to customize the patterns.
+
+== Complete Configuration
+
+If you used the suggested configurations from each section above,
+your `datasource.js` file should have the following:
+
+[source,typescript]
+----
+// @ts-check
+const { Config } = require("@formulaic/ormconfig");
+
+const config = new Config({
+  type: "mysql",
+  database: "myAppDB",
+
+  hostByNodeEnv: {
+    production: "db",
+  },
+
+  user: "my-user",
+  pass: "developmentPassword",
+
+  __dirname,
+});
+
+const options = config.toConnectionOptions();
+const dataSource = config.toDataSource();
+
+module.exports = { options, dataSource };
+----
