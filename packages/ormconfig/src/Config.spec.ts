@@ -56,6 +56,16 @@ describe("configuration", () => {
 
   });
 
+  describe("migrations", () => {
+
+    it("loads based on '__dirname' if provided", () => {
+      expect(config.toConnectionOptions().migrations).toStrictEqual([
+        "/test/dist/migrations/*.js",
+      ]);
+    });
+
+  });
+
   describe("sync", () => {
 
     describe.each(["mysql", "postgres", "cockroachdb"] as const)("in %s", (type) => {

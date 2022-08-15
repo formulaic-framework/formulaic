@@ -66,6 +66,31 @@ export interface ORMConfigBase {
    * Additional sources of entities, added to the defaults.  See {@link entities} for more information.
    */
   additionalEntities?: (string | Function | EntitySchema<any>)[];
+
+  /**
+   * Provide a list of migrations that will override all default sources normally used to find migrations.
+   *
+   * If {@link __dirname} or {@link migrationRoot} are provided, migration files will automatically be found -
+   * by default, "{@link __dirname}/dist/migrations/*.js" is used.  (Override the pattern "*.js" with {@link migrationFileWildcard}).
+   *
+   * To provide additional migrations without overriding this default search, use {@link additionalMigrations}.
+   */
+  migrations?: MixedList<string | Function>;
+
+  /**
+   * The directory containing migration files (which should match the pattern defined by {@link migrationFileWildcard}).
+   *
+   * If {@link __dirname} is provided, `migrationRoot` is set to "{@link __dirname}/dist/migrations".
+   */
+  migrationRoot?: string;
+
+  /**
+   * A pattern to match migration files inside {@link migrationRoot}.
+   * Defaults to `*.js`.
+   */
+  migrationFileWildcard?: string;
+
+  additionalMigrations?: (string | Function)[];
 }
 
 export interface ORMConfigRemote {
@@ -148,6 +173,7 @@ export class Config {
           type: options.type,
           database,
           entities: this.getEntities(options),
+          migrations: this.getMigrations(options),
           synchronize,
         };
       } else {
@@ -155,6 +181,7 @@ export class Config {
           type: options.type,
           database,
           entities: this.getEntities(options),
+          migrations: this.getMigrations(options),
           synchronize,
         };
       }
@@ -181,6 +208,7 @@ export class Config {
           type: options.type,
           database,
           entities: this.getEntities(options),
+          migrations: this.getMigrations(options),
           synchronize,
         });
       } else {
@@ -188,6 +216,7 @@ export class Config {
           type: options.type,
           database,
           entities: this.getEntities(options),
+          migrations: this.getMigrations(options),
           synchronize,
         });
       }
@@ -210,6 +239,8 @@ export class Config {
 
       entities: this.getEntities(options),
 
+      migrations: this.getMigrations(options),
+
       synchronize,
     } as const;
   }
@@ -227,6 +258,8 @@ export class Config {
       password: this.getVar("POSTGRES_PASSWORD", options.pass, undefined),
 
       entities: this.getEntities(options),
+
+      migrations: this.getMigrations(options),
 
       synchronize,
     } as const;
@@ -248,6 +281,36 @@ export class Config {
       searchPath,
       ...additional,
     ];
+  }
+
+  protected getMigrations(options: ORMConfigBase): MixedList<string | Function> {
+    if(options.migrations) {
+      return options.migrations;
+    }
+
+    const additional = options.additionalMigrations ?? [];
+
+    const searchPath = this.getMigrationSearchPath(options);
+    if(!searchPath) {
+      return additional;
+    }
+
+    return [
+      searchPath,
+      ...additional,
+    ];
+  }
+
+  protected getMigrationSearchPath(options: ORMConfigBase): string | undefined {
+    const defaultRoot = options.__dirname ? join(options.__dirname, "dist/migrations") : undefined;
+    const root = options.migrationRoot ?? defaultRoot;
+
+    if(!root) {
+      return undefined;
+    }
+
+    const wildcard = options.migrationFileWildcard ?? "*.js";
+    return join(root, wildcard);
   }
 
   protected getEntitySearchPath(options: ORMConfigBase): string {
