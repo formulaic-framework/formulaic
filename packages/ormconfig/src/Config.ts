@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
-import { ConnectionOptions, DataSource } from "typeorm";
+import { join } from "path";
+import { ConnectionOptions, DataSource, EntitySchema, MixedList } from "typeorm";
 
 export type DatabaseType
   = "mysql"
@@ -31,6 +32,40 @@ export interface ORMConfigBase {
    * Defaults to `false`.
    */
   sync?: boolean;
+
+  /**
+   * A list of database entities.
+   *
+   * By default, the following sources are used for entities:
+   * - If {@link __dirname} is provided, searches the 'src' directory for '*.entity.ts'
+   * - {@link additionalEntities}
+   *
+   * Providing `entities` overrides all above options.
+   */
+  entities?: MixedList<string | Function | EntitySchema<any>>;
+
+  /**
+   * If {@link __dirname} is provided, entities are searched (via wildcard, see {@link entityTSWildcard})
+   * inside the source directory, which defaults to '{@link __dirname}/src'.
+   *
+   * (unless {@link entities} is provided, which overrides all other entity sources)
+   *
+   * Override {@link entitySrcRoot} if you wish to search a directory other than 'src', or you do not wish to provide {@link __dirname}.
+   */
+  entitySrcRoot?: string;
+
+  /**
+   * A wildcard used to search inside {@link entitySrcRoot} (which uses {@link __dirname} by default)
+   * for entity files.
+   *
+   * Defaults to searching any directory (including nested) for '*.entity.ts'.
+   */
+  entityTSWildcard?: string;
+
+  /**
+   * Additional sources of entities, added to the defaults.  See {@link entities} for more information.
+   */
+  additionalEntities?: (string | Function | EntitySchema<any>)[];
 }
 
 export interface ORMConfigRemote {
@@ -112,12 +147,14 @@ export class Config {
         return {
           type: options.type,
           database,
+          entities: this.getEntities(options),
           synchronize,
         };
       } else {
         return {
           type: options.type,
           database,
+          entities: this.getEntities(options),
           synchronize,
         };
       }
@@ -143,12 +180,14 @@ export class Config {
         return new DataSource({
           type: options.type,
           database,
+          entities: this.getEntities(options),
           synchronize,
         });
       } else {
         return new DataSource({
           type: options.type,
           database,
+          entities: this.getEntities(options),
           synchronize,
         });
       }
@@ -169,6 +208,8 @@ export class Config {
       username: this.getVar("MYSQL_USER", options.user, "root"),
       password: this.getVar("MYSQL_PASSWORD", options.pass, this.getVar("MYSQL_ROOT_PASSWORD", undefined, undefined)),
 
+      entities: this.getEntities(options),
+
       synchronize,
     } as const;
   }
@@ -185,8 +226,40 @@ export class Config {
       username: this.getVar("POSTGRES_USER", options.user, "root"),
       password: this.getVar("POSTGRES_PASSWORD", options.pass, undefined),
 
+      entities: this.getEntities(options),
+
       synchronize,
     } as const;
+  }
+
+  protected getEntities(options: ORMConfigBase): MixedList<string | Function | EntitySchema<any>> {
+    if(options.entities) {
+      return options.entities;
+    }
+
+    const additional = options.additionalEntities ?? [];
+
+    const searchPath = this.getEntitySearchPath(options);
+    if(!searchPath) {
+      return additional;
+    }
+
+    return [
+      searchPath,
+      ...additional,
+    ];
+  }
+
+  protected getEntitySearchPath(options: ORMConfigBase): string {
+    const defaultRoot = options.__dirname ? join(options.__dirname, "src") : undefined;
+    const root = options.entitySrcRoot ?? defaultRoot;
+
+    if(!root) {
+      return undefined;
+    }
+
+    const wildcard = options.entityTSWildcard ?? "**/*.entity.ts";
+    return join(root, wildcard);
   }
 
   protected getDefaultHostname(options: ORMConfigRemote): string {

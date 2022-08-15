@@ -16,7 +16,45 @@ class ConfigFixture extends Config {
 
 describe("configuration", () => {
 
+  let minimal: Config;
+  let config: Config;
+  let withDirname: Config;
+
+  beforeAll(() => {
+    minimal = new Config({ type: "mysql", database: "test" });
+    config = new Config({
+      type: "mysql",
+      database: "test",
+      __dirname: "/test/",
+    });
+  });
+
   afterEach(() => jest.clearAllMocks());
+
+  describe("entities", () => {
+
+    it("defaults to no entities", () => {
+      expect(minimal.toConnectionOptions().entities).toStrictEqual([]);
+    });
+
+    it("uses 'additionalEntities' if no other variables set", () => {
+      const additional = new Config({
+        type: "mysql",
+        database: "test",
+        additionalEntities: [ "src/entities.ts" ],
+      });
+      expect(additional.toConnectionOptions().entities).toStrictEqual([
+        "src/entities.ts",
+      ]);
+    });
+
+    it("computes entities based on '__dirname' if provided", () => {
+      expect(config.toConnectionOptions().entities).toStrictEqual([
+        "/test/src/**/*.entity.ts",
+      ]);
+    });
+
+  });
 
   describe("sync", () => {
 
