@@ -24,10 +24,12 @@ const config = new Config({
 });
 
 // For TypeORM < 3.0
-// export default const options = config.toConnectionOptions();
+// const options = config.toConnectionOptions();
 
 // For TypeORM >= 3.0
-export default const dataSource = config.toDataSource();
+const dataSource = config.toDataSource();
+
+module.exports = dataSource;
 ----
 
 == Options
