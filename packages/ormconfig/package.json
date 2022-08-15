@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/ormconfig",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "packageManager": "yarn@3.2.1",
   "main": "./dist/src/index.js",
   "scripts": {
