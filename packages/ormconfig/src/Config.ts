@@ -46,7 +46,7 @@ export interface ORMConfigRemote {
    * to `{ "production": "<hostname>" }`, which leaves the default to `localhost`.
    */
   host?: string;
-  port?: string;
+  port?: number;
   user?: string;
   pass?: string;
 }
