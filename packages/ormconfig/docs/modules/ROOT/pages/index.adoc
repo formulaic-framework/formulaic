@@ -1,0 +1,146 @@
+= TypeORM Configuration Utilities
+
+Useful utilities for configuring TypeORM.
+
+== Features
+
+* Provides a default configuration that can work out-of-the-box
+* Default configuration values can be easily overridden
+* Uses standard environment variables for runtime configuration
+** Interoperable with variables used by common Docker database images (`mysql`, `mariadb`, `postgres`, and more)
+
+== Installation
+
+Install the utilities via `@formulaic/ormconfig`, or import from the bundle `@formulaic/api`.
+
+Create a `datasource.js` file:
+
+[source,js]
+----
+const { Config } = require("@formulaic/ormconfig");
+
+const config = new Config({
+  type: "mysql",
+});
+
+// For TypeORM < 3.0
+// export default const options = config.toConnectionOptions();
+
+// For TypeORM >= 3.0
+export default const dataSource = config.toDataSource();
+----
+
+== Options
+
+Each section describes a variable that is applicable for one or more databases.
+
+When a variable can be set via more than 1 source, the various sources will be listed from the most default fallback option
+to the highest priority option, that will override alternatives.
+
+Any environment variable can be supplied by a file.
+If you have a file `/tmp/username.txt` that contains a username (e.g. `myusername`),
+set `MYSQL_USER_FILE=/tmp/username.txt`.
+
+Providing a value directly (`MYSQL_USER`) as well as the filename (`MYSQL_USER_FILE`) will prevent the file from being read.
+
+=== Type
+
+The type of database.
+
+Set via:
+
+- Configuration `type`
+
+Values:
+
+* `"mysql"`
+* `"postgres"`
+* `"cockroachdb"`
+* `"sqlite"`
+* `"better-sqlite3"`
+
+=== Synchronize
+
+Can be used on any database.
+
+Determines if the database will update it's schema each time it starts,
+instead of using migrations.
+
+Set via:
+
+- Default `false`
+- Configuration `sync: true`
+- Environment `DB_SYNC=true`
+
+=== Hostname
+
+Can be used on all databases except SQLite.
+
+* Default `localhost`
+* Configuration `hostByNodeEnv`
+** Object mapping `NODE_ENV` values to hostnames
+** Use for production, e.g. `hostByNodeEnv: { "production": "db" }`
+* Configuration `host`
+* Environment variables
++
+[horizontal]
+`"mysql"`:: `MYSQL_DATABASE`
+`"postgres"`:: `POSTGRES_DB`
+`"cockroachdb"`:: `POSTGRES_DB`
+
+=== Port
+
+Can be used on all databases except SQLite.
+
+* Default
++
+[horizontal]
+`"mysql"`:: `3306`
+`"postgres"`:: `5432`
+`"cockroachdb`:: `5432`
+* Configuration `port`
+* Environment `DB_PORT`
+
+=== Username
+
+Can be used on all databases except SQLite.
+
+* Default `root`
+* Configuration `user`
+* Environment
++
+[horizontal]
+`"mysql"`:: `MYSQL_USER`
+`"postgres"`:: `POSTGRES_USER`
+`"cockroachdb"`:: `POSTGRES_USER`
+
+=== Password
+
+Can be used on all databases except SQLite.
+
+* Configuration `pass`
+* Environment
++
+[horizontal]
+`"mysql"`:: `MYSQL_PASSWORD` (falls back to `MYSQL_ROOT_PASSWORD`)
+`"postgres"`:: `POSTGRES_PASSWORD`
+`"cockroachdb"`:: `POSTGRES_PASSWORD`
+
+=== Database
+
+Can be used on all databases except SQLite.
+
+* Configuration `database`
+* Environment
++
+[horizontal]
+`"mysql"`:: `MYSQL_DATABASE`
+`"postgres"`:: `POSTGRES_DB`
+`"cockroachdb"`:: `POSTGRES_DB`
+
+=== Path
+
+Used only for SQLite.  One (and only one) of the configuration values must be set.
+
+- Configuration `inMemory` (uses `:memory:`)
+- Configuration `path`

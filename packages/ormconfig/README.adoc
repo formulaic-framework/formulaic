@@ -1,0 +1,91 @@
+= Reusable TypeORM Configuration
+:source-highlighter: highlight.js
+
+This library provides a relatively opinionated set of default TypeORM configuration options.
+
+== Installation
+
+To add `@formulaic/ormconfig` to your project, install the package (alongside TypeORM, and a TypeORM driver of your choice)
+
+[source,sh]
+----
+yarn add @formulaic/ormconfig typeorm # mysql2
+----
+
+Then use Formulaic's defaults in your config file:
+
+.`ormconfig.js`
+[source,js]
+----
+const { Config } = require("@formulaic/ormconfig");
+
+module.exports = new Config({
+  __dirname,
+  type: "mysql",
+  database: "mydb",
+}).toDataSource();
+----
+
+== Configuration
+
+=== Connection Settings
+
+Many options exist to set various database connection settings.
+
+The configuration varies for each database - we've documented each separately.
+
+.MySQL Settings
+[%collapsible]
+====
+[horizontal]
+Hostname::
+The hostname used to connect to the database.
++
+* `$DB_HOST`
+* `$DB_HOST_FILE`
+* `host`
+* `"localhost"`
+
+Port::
+The network port to connect to the database with.
++
+* `$DB_PORT`
+* `port`
+* `3306`
+====
+
+=== ORM Settings
+
+In addition to the connection settings, developers may wish to adjust the following configuration settings,
+all set in the constructor of `Config`.
+
+These settings do not have run-time equivalents, and cannot be set by environment variables.
+
+[horizontal]
+`type`::
+Provide the type of database.  Not all databases supported by TypeORM are
+supported by this library.
+
+`__dirname`::
+Pass the Node https://nodejs.org/docs/latest/api/modules.html#modules_dirname[`__dirname`] variable,
+used to set the default location for entities and migrations relative to your project's directory.
+
+`silent`::
+This library is usually silent, but will emit a console warning
+if an environment variable points at a file that cannot be read:
++
+.Example Error (without `silent`)
+[source,sh]
+----
+rm -rf /tmp/database_password.txt
+export MYSQL_PASSWORD_FILE="/tmp/database_password.txt"
+
+yarn typeorm migration:generate initial_migration
+# Warning: could not read from '$MYSQL_PASSWORD' file - attempted to read '/tmp/database_password.txt' (set by '#MYSQL_PASSWORD_FILE')
+----
++
+Set `silent` to `true` to suppress these warnings.
+
+`sync`::
+Set to `true` to synchronize the database structure on application boot.
+Defaults to `false`.
