@@ -103,10 +103,3 @@ for TAG_SUFFIX in '' {a..z}; do
 done
 
 printf "%s" "$COMMIT_MESSAGE"
-
-# We need to revert the checked-in artifacts, since stable shouldn't move
-# just yet, and some of our tools expect "latest" to always be up-to-date
-if [[ $PRERELEASE -eq 1 ]]; then
-  git checkout "$CURRENT_COMMIT" -- "$REPO_DIR"/packages/*/bin
-  git commit -m "Reset binaries to stable"
-fi
