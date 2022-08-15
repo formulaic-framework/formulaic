@@ -28,6 +28,20 @@ export interface ORMConfigBase {
   __dirname?: string;
 
   /**
+   * The directory inside {@link __dirname} used to store source files.
+   *
+   * Defaults to `"src"`.
+   */
+  src?: string;
+
+  /**
+   * The directory inside {@link __dirname} used to store compiled code.
+   *
+   * Defaults to `"dist"`.
+   */
+  dist?: string;
+
+  /**
    * If the database structure should be updated and synchronized on boot.
    * Defaults to `false`.
    */
@@ -45,14 +59,36 @@ export interface ORMConfigBase {
   entities?: MixedList<string | Function | EntitySchema<any>>;
 
   /**
+   * Determines if entities should be loaded from compiled or uncompiled sources - determines if {@link entitySrcRoot} or {@link entityDistRoot}
+   * should be used.
+   *
+   * Defaults to `{default: "js", migration: "js", nest: "ts" }`.
+   */
+  entityMode?: "js" | "ts" | {
+    default?: "js" | "ts";
+    migration?: "js" | "ts";
+    nest?: "js" | "ts";
+  };
+
+  /**
    * If {@link __dirname} is provided, entities are searched (via wildcard, see {@link entityTSWildcard})
-   * inside the source directory, which defaults to '{@link __dirname}/src'.
-   *
-   * (unless {@link entities} is provided, which overrides all other entity sources)
-   *
-   * Override {@link entitySrcRoot} if you wish to search a directory other than 'src', or you do not wish to provide {@link __dirname}.
+   * inside the source directory, which defaults to '{@link __dirname}/{@link src}'.
    */
   entitySrcRoot?: string;
+
+  /**
+   * If {@link __dirname} is provided, entities are searched (via wildcard, see {@link entityJSWildcard})
+   * inside the output directory, which defaults to '{@link __dirname}/{@link dist}'.
+   */
+  entityDistRoot?: string;
+
+  /**
+   * A wildcard used to search inside {@link entityDistRoot} (which uses {@link __dirname} by default)
+   * for compiled entity models.
+   *
+   * Defaults to searching any directory (including nested) for '*.entity.js'.
+   */
+  entityJSWildcard?: string;
 
   /**
    * A wildcard used to search inside {@link entitySrcRoot} (which uses {@link __dirname} by default)
@@ -302,7 +338,8 @@ export class Config {
   }
 
   protected getMigrationSearchPath(options: ORMConfigBase): string | undefined {
-    const defaultRoot = options.__dirname ? join(options.__dirname, "dist/migrations") : undefined;
+    const dist = this.getDist(options);
+    const defaultRoot = options.__dirname ? join(options.__dirname, dist, "migrations") : undefined;
     const root = options.migrationRoot ?? defaultRoot;
 
     if(!root) {
@@ -314,15 +351,64 @@ export class Config {
   }
 
   protected getEntitySearchPath(options: ORMConfigBase): string {
-    const defaultRoot = options.__dirname ? join(options.__dirname, "src") : undefined;
-    const root = options.entitySrcRoot ?? defaultRoot;
+    const mode = this.getEntityMode(options);
 
-    if(!root) {
+    const searchRootConfig = mode === "js" ? options.entityDistRoot : options.entitySrcRoot;
+    if(!searchRootConfig && !options.__dirname) {
       return undefined;
     }
 
-    const wildcard = options.entityTSWildcard ?? "**/*.entity.ts";
-    return join(root, wildcard);
+    const jsWildcard = options.entityJSWildcard ?? "**/*.entity.js";
+    const tsWildcard = options.entityTSWildcard ?? "**/*.entity.ts";
+
+    const root = searchRootConfig ?? join(
+      options.__dirname,
+      (mode === "js" ? this.getDist(options) : this.getSrc(options)),
+      (mode === "js" ? jsWildcard : tsWildcard),
+    );
+
+    return root;
+  }
+
+  protected getEntityMode(options: ORMConfigBase): "js" | "ts" {
+    const config = options.entityMode;
+    const mode = this.getEnvironmentVarValue("ORM_MODE");
+
+    if(typeof config === "string" && (config === "js" || config === "ts")) {
+      return config;
+    }
+
+    if(typeof config === "string") {
+      if(!options.silent) {
+        console.warn("[ORMConfig]: Unable to determine mode to load database entities: ", config);
+      }
+    }
+
+    if(!!config && typeof config === "object") {
+      if(config[mode] === "js" || config[mode] === "ts") {
+        return config[mode];
+      }
+      if(config.default === "js" || config.default === "ts") {
+        return config.default;
+      }
+      if(!options.silent) {
+        console.warn("[ORMConfig]: ORM_MODE did not match any preset, nor was a default provided.  Using defaults.", config, mode);
+      }
+    }
+
+    if(mode === "nest") {
+      return "ts";
+    }
+
+    return "js";
+  }
+
+  protected getSrc(options: ORMConfigBase): string {
+    return options.src ?? "src";
+  }
+
+  protected getDist(options: ORMConfigBase): string {
+    return options.dist ?? "dist";
   }
 
   protected getDefaultHostname(options: ORMConfigRemote): string {
