@@ -1,0 +1,6 @@
+name: ormconfig
+version: 0.1.0
+title: TypeORM Config Utility
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
