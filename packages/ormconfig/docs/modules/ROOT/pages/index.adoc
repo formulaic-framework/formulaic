@@ -20,7 +20,17 @@ Create a `datasource.js` file:
 const { Config } = require("@formulaic/ormconfig");
 
 const config = new Config({
+  __dirname, // <.>
   type: "mysql",
+
+  hostByNodeEnv: {
+    production: "db", // <.>
+  },
+
+  user: "root",
+  pass: "mySecretPassword",
+
+  database: "example-app",
 });
 
 // For TypeORM < 3.0
@@ -31,6 +41,8 @@ const dataSource = config.toDataSource();
 
 module.exports = dataSource;
 ----
+<.> Providing `__dirname` is optional, but will allow entities to be automatically found in source files, and more.
+<.> Configured to use `"db"` as the hostname for production, while falling back to `"localhost"` in development
 
 == Options
 
