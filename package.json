@@ -1,6 +1,6 @@
 {
   "name": "formulaic",
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.2.3",
   "private": true,
   "scripts": {
     "typedoc": "typedoc --name 'Formulaic Framework' --out out/typedoc/ --entryPointStrategy Packages .",
