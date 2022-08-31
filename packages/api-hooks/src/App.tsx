@@ -1,7 +1,6 @@
-import { useQuery, useRequest } from "@formulaic/api-hooks";
 import { useState } from 'react'
-import logo from './logo.svg'
 import './App.css'
+import { useQuery, useRequest } from './lib';
 
 async function currentTime() {
   const d = new Date();
@@ -13,7 +12,6 @@ async function currentTime() {
 
 function App() {
   const [count, setCount] = useState(0)
-
   const [requestDate, requestedDate] = useRequest(() => currentTime());
   const lastDate = requestedDate.last;
 
@@ -26,26 +24,20 @@ function App() {
       <h3>useRequest</h3>
       <div className="card">
         <p>Date fetched is {lastDate.kind} {lastDate.kind === "Literal" ? lastDate.getData() : "(n/a)"}</p>
-        <p>
-          <button type="button" onClick={() => requestDate()}>
-            Submit Request
-          </button>
-        </p>
+        <button onClick={() => requestDate()}>
+          Submit Request
+        </button>
       </div>
 
       <h3>useQuery</h3>
       <div className="card">
-        <p>
-          Date queried is {queriedDate.kind} {queriedDate.kind === "Literal" ? queriedDate.getData() : "(n/a)"}
-        </p>
-        <p>
-          <button type="button" onClick={() => refreshDate()}>
-            Refresh
-          </button>
-        </p>
+        <p>Date queried is {queriedDate.kind} {queriedDate.kind === "Literal" ? queriedDate.getData() : "(n/a)"}</p>
+        <button onClick={() => refreshDate()}>
+          Refresh
+        </button>
       </div>
     </div>
-  )
+  );
 }
 
 export default App

@@ -34,5 +34,5 @@ export {
 } from "./base/FP";
 export {
   KindSelection,
-} from "./base/util";
+} from "@formulaic/base-fp";
 export { FPConstructor, oneOfFP } from "./util/oneOfFP";

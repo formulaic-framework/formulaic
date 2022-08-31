@@ -107,6 +107,7 @@ jobs:
     - name: 'Run test suites tests'
       run: |
         yarn workspace @formulaic/fp test
+        yarn workspace @formulaic/api-hooks test
         yarn workspace @formulaic/ormconfig test
         yarn workspace server test
         yarn workspace server test:e2e
