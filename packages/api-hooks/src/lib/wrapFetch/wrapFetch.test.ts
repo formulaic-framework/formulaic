@@ -5,13 +5,13 @@ import { CancelablePromise, PetStoreClient } from "../../helpers/generated";
 import { Literal, NoValue } from "@formulaic/base-fp";
 import { wrapFetch } from "./wrapFetch";
 
-class NotFound<T> extends NoValue<T, "NoValue", 404> {
-  public override readonly kind: "NoValue";
+class NotFound<T> extends NoValue<T, "NotFound", 404> {
+  public override readonly kind: "NotFound";
   public override readonly status: 404;
 
   public constructor() {
     super();
-    this.kind = "NoValue";
+    this.kind = "NotFound";
     this.status = 404;
   }
 }
