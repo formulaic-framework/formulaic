@@ -100,13 +100,14 @@ jobs:
     - name: 'Build projects'
       run: |
         yarn workspaces foreach -vptR \
-          --from '{server,@formulaic/fp}' \
+          --from '{server,@formulaic/fp,@formulaic/api-hooks}' \
           run build
       shell: bash
 
     - name: 'Run test suites tests'
       run: |
         yarn workspace @formulaic/fp test
+        yarn workspace @formulaic/api-hooks test
         yarn workspace @formulaic/ormconfig test
         yarn workspace server test
         yarn workspace server test:e2e

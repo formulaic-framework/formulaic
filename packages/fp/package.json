@@ -36,6 +36,7 @@
     "url": "https://github.com/formulaic-framework/formulaic.git"
   },
   "dependencies": {
+    "@formulaic/base-fp": "workspace:^",
     "@nestjs/swagger": "^6.0.4",
     "chalk": "^4.0.0",
     "class-transformer": "^0.5.1",

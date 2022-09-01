@@ -1,0 +1,23 @@
+{
+  "name": "@formulaic/base-fp",
+  "version": "2.0.1",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepack": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  },
+  "packageManager": "yarn@3.2.1",
+  "author": {
+    "name": "Flyyn"
+  },
+  "license": "MIT",
+  "repository": {
+    "directory": "packages/base-fp",
+    "type": "git",
+    "url": "https://github.com/formulaic-framework/formulaic.git"
+  }
+}

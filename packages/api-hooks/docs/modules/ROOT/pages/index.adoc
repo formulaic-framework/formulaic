@@ -1,0 +1,53 @@
+= API Hooks
+
+Formulaic provides generic hooks optimized for making API calls in React applications.
+
+== Features
+
+Returns {fp} data types::
+Providing strongly typed and quickly usable interfaces.
+
+Optimized for APIs::
+Uses memoization and debouncing (optional, enabled by default)
+to reduce network traffic.
+
+Easy filtering::
+You can quickly disable the hook until parameters are valid.
+
+Generic integration::
+Any API (or even non-API) that returns Promises can be provided to the hooks.
+
+== Installation
+
+Install `@formulaic/api-hooks` from NPM (or import from the `@formulaic/react` bundle)
+
+[source,sh]
+----
+yarn add @formulaic/api-hooks
+----
+
+== Usage
+
+Two main hooks are provided: `useQuery` and `useRequest`.
+
+=== useQuery
+
+`useQuery` executes requests (that pass validation) immediately on load,
+and each time one of the arguments updates.
+
+`useQuery` includes debounce logic and more, and is ready to be used
+with minimal logic needed.
+
+If you are fetching data or using APIs without side-effects,
+`useQuery` is generally the hook to use.
+
+xref:use-query.adoc[Learn more about useQuery]
+
+=== useRequest
+
+`useRequest` provides a callback that can manually trigger requests.
+
+This is safer for requests with side-effects where you want to control when requests are sent,
+such as submitting data.
+
+xref:use-request.adoc[Learn more about useRequest]

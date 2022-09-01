@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "@formulaic/acl": "workspace:^",
+    "@formulaic/api-hooks": "workspace:^",
+    "@formulaic/base-fp": "workspace:^",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "vite-plugin-dts": "^1.2.1"

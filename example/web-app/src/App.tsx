@@ -1,43 +1,49 @@
+import { useQuery, useRequest } from "@formulaic/api-hooks";
 import { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 
+async function currentTime() {
+  const d = new Date();
+  const h = d.getHours();
+  const m = d.getMinutes();
+  const s = d.getSeconds();
+  return `${h}:${m}:${s}`;
+}
+
 function App() {
   const [count, setCount] = useState(0)
 
+  const [requestDate, requestedDate] = useRequest(() => currentTime());
+  const lastDate = requestedDate.last;
+
+  const [queriedDate, refreshDate] = useQuery(() => currentTime(), []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
+      <h1>Formulaic API Hooks</h1>
+
+      <h3>useRequest</h3>
+      <div className="card">
+        <p>Date fetched is {lastDate.kind} {lastDate.kind === "Literal" ? lastDate.getData() : "(n/a)"}</p>
         <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
+          <button type="button" onClick={() => requestDate()}>
+            Submit Request
           </button>
         </p>
+      </div>
+
+      <h3>useQuery</h3>
+      <div className="card">
         <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
+          Date queried is {queriedDate.kind} {queriedDate.kind === "Literal" ? queriedDate.getData() : "(n/a)"}
         </p>
         <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
+          <button type="button" onClick={() => refreshDate()}>
+            Refresh
+          </button>
         </p>
-      </header>
+      </div>
     </div>
   )
 }
