@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/api",
-  "version": "3.0.1",
+  "version": "3.0.2-rc.1",
   "license": "MIT",
   "type": "commonjs",
   "homepage": "https://github.com/codelenny/api",
@@ -39,5 +39,6 @@
     "@formulaic/id": "workspace:^",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"
-  }
+  },
+  "stableVersion": "3.0.1"
 }

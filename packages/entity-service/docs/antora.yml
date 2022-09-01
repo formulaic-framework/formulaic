@@ -1,5 +1,5 @@
 name: entity-service
-version: 3.0.1
+version: 3.0.2-rc.1
 title: Entity Service
 start_page: ROOT:index.adoc
 nav:

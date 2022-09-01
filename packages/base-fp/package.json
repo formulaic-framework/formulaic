@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/base-fp",
-  "version": "2.0.1",
+  "version": "2.1.0-rc.1",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -19,5 +19,6 @@
     "directory": "packages/base-fp",
     "type": "git",
     "url": "https://github.com/formulaic-framework/formulaic.git"
-  }
+  },
+  "stableVersion": "2.0.1"
 }

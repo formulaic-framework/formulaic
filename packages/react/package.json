@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/react",
-  "version": "0.2.1",
+  "version": "0.3.0-rc.1",
   "main": "./dist/formulaic.umd.js",
   "module": "./dist/formulaic.es.js",
   "types": "./dist/index.d.ts",
@@ -41,5 +41,6 @@
   },
   "author": {
     "name": "Flyyn"
-  }
+  },
+  "stableVersion": "0.2.1"
 }
