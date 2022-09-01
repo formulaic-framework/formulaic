@@ -1,0 +1,148 @@
+= useQuery Hook
+
+`useQuery` is made for fetching data and other requests that don't have side-effects.
+
+== API
+
+[source,typescript]
+----
+import { useQuery } from "@formulaic/api-hooks";
+
+const [latest, refresh, data] = useQuery(callback, args, options);
+----
+
+`useQuery` has two required arguments - a callback used to fetch data,
+and an array containing values to pass to the callback function.
+
+.Example Callback
+[source,typescript]
+----
+async function getUserInfo(userId: string, fullProfile: boolean): Promise<object> {}
+
+useQuery(getUserInfo, ["admin", true]);
+----
+
+`useQuery` returns three properties - the latest result,
+a function to refresh results, and an object containing additional information.
+
+== Refetching Data
+
+Data will automatically be re-fetched if any of the arguments are changed.
+
+You can also call the `refresh` function to manually reload data at will.
+
+== Configuring Debounce
+
+`useQuery` debounces requests by default - reducing the number of times data is reloaded
+if the input arguments are rapidly changing.
+
+Three options control this behavior:
+
+`debounce`::
+A duration (in milliseconds) to wait after a request before sending another.
+Defaults to 100ms.
+
+`maxDelay`::
+Provides a maximum period between requests, ensuring requests are still sent
+even if input is continually changing.
+
+`waitTime`::
+A duration (in milliseconds) to wait before sending a request.
+
+=== Configuring individual hooks
+
+The third parameter in `useQuery` allows you to se `debounce`, `maxDelay`, and `waitTime`.
+
+=== Setting defaults
+
+You can override the defaults using the `QueryConfiguration` context.
+
+[source,jsx]
+----
+import { QueryConfiguration } from "@formulaic/api-hooks";
+
+(
+  <QueryConfiguration
+    debounce={50}
+    wait-time={100}
+    max-delay={5000}
+  >
+    { /* ... */ }
+  </QueryConfiguration>
+)
+----
+
+== Using the latest results
+
+`useQuery` returns results formatted with {fp} to make it easy to distinguish between
+result types.
+
+.Example handling responses
+[source,typescript]
+----
+function UserInfo() {
+  const [userInfo] = useQuery(getUserInfo, ["admin", true]);
+
+  if(userInfo.hasError) {
+    return `Error: ${userInfo.kind}`;
+  } else if(userInfo.noValue) {
+    return `Fetching data, or no user found.`;
+  } else if(userInfo.hasData) {
+    // If `getUserInfo` resolves to an FP type, it will be directly used.
+    // Otherwise responses will be wrapped into a `Literal`.
+    const profile = userInfo.getData();
+    return `User ${profile.name} (${profile.id})`;
+  } else {
+    return `Unexpected response: ${userInfo.kind}`;
+  }
+}
+----
+
+== Skipping Invalid Requests
+
+Some requests may not be valid.  `useQuery` provides two different ways to filter invalid input.
+
+First, inside the callback function, you can return `false` instead of a `Promise`,
+which will skip the request.
+
+[source,typescript]
+----
+function ProfileLookup() {
+  const [profileId, setProfileId] = useState<null | string>(null);
+  const [profile, refresh] = useQuery(
+    (id: string | null) => id !== null ? getUserInfo(id, false) : false,
+    [ profileId ],
+  );
+  // ...
+}
+----
+
+The above example also demonstrates how you can ensure type safety -
+`id` may be `null` if the profile hasn't been selected, so that case is filtered
+out so `getUserInfo` will only get strings.
+
+=== Using a Validation Function
+
+Alternatively, you may use the `validate` option.
+
+The function filters requests earlier
+(before requests go through debouncing),
+which may improve performance.
+
+However, it does not provide the type safety
+that you get inside the function.
+
+[source,typescript]
+----
+function ProfileLookup() {
+  const [profileId, setProfileId] = useState("");
+  const [profile, refresh] = useQuery(
+    getUserInfo,
+    [profileId, false],
+    {
+      validate: (id: string) => id.length > 0,
+    },
+  );
+  // ...
+}
+----

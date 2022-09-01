@@ -1,0 +1,86 @@
+= useRequest Hook
+
+The `useRequest` hook configures an API request that can be called manually later.
+
+This is good for actions that will cause side-effects,
+such as a login form.
+
+== API
+
+[source,typescript]
+----
+import { useRequest } from "@formulaic/api-hooks";
+
+const [login, loginReq] = useRequest(callback, options);
+----
+
+== Request Callback
+
+`useRequest` takes in a function that should execute
+requests.
+
+The callback should return `false` to cancel requests,
+or return a Promise that resolves with the API response.
+
+.Example Request Function
+[source,typescript]
+----
+async function loginApi(username: string, password: string): Promise<string> {
+  const jwt = await axios.post("/login", { username, password });
+  return jwt;
+}
+
+useRequest(loginApi);
+----
+
+== Request Function
+
+`useRequest` returns a function to execute requests,
+that takes the same parameters as the callback function.
+
+[source,jsx]
+----
+function LoginPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [login] = useRequest(loginApi);
+
+  return (
+    <div>
+      { /* login page to set username/password */ }
+      <button
+        onClick={() => login(username, password)}
+      >
+        Login
+      </button>
+    </div>
+  );
+}
+----
+
+Calling the request function will return a `Promise`
+that resolves to one of the following {fp} instances:
+
+`SkippedRequest`::
+If the request callback returns `false`
+to skip invalid requests.
+
+`FailedRequest`::
+If any underlying API returns an unexpected error.
+
+Response Data::
+Any data returned will be passed through.
+Non-FP data will be wrapped in `Literal`.
+
+== Additional Data
+
+Along with the request function,
+`useRequest` returns an object with additional properties, including:
+
+`last`::
+Containing the last returned data or error.
+
+`lastData`::
+Contains the last successful response,
+ignoring errors or other responses found later.
