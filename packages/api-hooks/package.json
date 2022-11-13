@@ -1,6 +1,6 @@
 {
   "name": "@formulaic/api-hooks",
-  "version": "0.0.1-rc.1",
+  "version": "0.0.1",
   "main": "./dist/api-hooks.umd.js",
   "module": "./dist/api-hooks.es.js",
   "types": "./dist/index.d.ts",
@@ -52,6 +52,5 @@
     "directory": "packages/api-hooks",
     "type": "git",
     "url": "https://github.com/formulaic-framework/formulaic.git"
-  },
-  "stableVersion": "0.0.0"
+  }
 }
